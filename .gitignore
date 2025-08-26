@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+
+# Node.js (for Vue.js frontend)
+node_modules/
+npm-debug.log*
+
+# Vue.js build output
+dist/
+
+# Environment variables
+.env
+
+# Other
+.claude
