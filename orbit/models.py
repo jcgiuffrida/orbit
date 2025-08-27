@@ -1,7 +1,9 @@
 from django.db import models
+import uuid
 
 
 class Person(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField()
     name_ext = models.CharField("Additional context to remember them by", blank=True)
     email = models.EmailField(blank=True)
@@ -24,6 +26,7 @@ class Person(models.Model):
 
 
 class Conversation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     CONVERSATION_TYPES = [
         ('in_person', 'In Person'),
         ('phone', 'Phone Call'),
@@ -49,6 +52,7 @@ class Conversation(models.Model):
 
 
 class ContactAttempt(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ATTEMPT_TYPES = [
         ('text', 'Text Message'),
         ('email', 'Email'),
@@ -72,6 +76,7 @@ class ContactAttempt(models.Model):
 
 
 class Relationship(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     RELATIONSHIP_TYPES = [
         ('partner', 'Partner'),
         ('family', 'Family'),
