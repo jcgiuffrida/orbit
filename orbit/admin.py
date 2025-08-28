@@ -4,13 +4,13 @@ from .models import Person, Conversation, ContactAttempt, Relationship
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'name_ext', 'email', 'phone', 'birthday', 'created_at')
-    list_filter = ('created_at', 'birthday')
-    search_fields = ('name', 'name_ext', 'email', 'how_we_met', 'notes')
+    list_display = ('name', 'name_ext', 'location', 'email', 'phone', 'conversations_')
+    list_filter = ('created_at', 'birthday', 'location')
+    search_fields = ('name', 'name_ext', 'location', 'email', 'how_we_met', 'notes')
     readonly_fields = ('created_at',)
     fieldsets = (
         ('Basic Info', {
-            'fields': ('name', 'name_ext', 'email', 'phone', 'birthday')
+            'fields': ('name', 'name_ext', 'location', 'email', 'phone', 'birthday')
         }),
         ('Background', {
             'fields': ('how_we_met', 'notes')
@@ -24,6 +24,9 @@ class PersonAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
+
+    def conversations_(self, obj):
+        return obj.conversations.count()
 
 
 @admin.register(Conversation)

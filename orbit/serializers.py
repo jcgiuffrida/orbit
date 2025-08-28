@@ -9,7 +9,7 @@ class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = [
-            'id', 'name', 'name_ext', 'email', 'phone', 'birthday',
+            'id', 'name', 'name_ext', 'email', 'phone', 'location', 'birthday',
             'how_we_met', 'notes', 'ai_summary', 'created_by_username', 
             'created_at', 'last_contacted'
         ]

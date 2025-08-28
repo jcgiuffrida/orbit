@@ -32,7 +32,6 @@
               filled
               placeholder="Search people..."
               clearable
-              @update:model-value="debouncedSearch"
             >
               <template v-slot:prepend>
                 <q-icon name="search" />
@@ -84,9 +83,9 @@
                 <div v-if="person.name_ext" class="text-caption text-grey-7 q-mb-sm">
                   {{ person.name_ext }}
                 </div>
-                <div v-if="person.how_we_met" class="text-body2 text-grey-8 q-mb-sm">
-                  <q-icon name="handshake" size="16px" class="q-mr-xs" />
-                  {{ person.how_we_met }}
+                <div v-if="person.location" class="text-body2 text-grey-8 q-mb-sm">
+                  <q-icon name="place" size="16px" class="q-mr-xs" />
+                  {{ person.location }}
                 </div>
                 <div v-if="person.last_contacted" class="text-caption text-accent">
                   <q-icon name="schedule" size="14px" class="q-mr-xs" />
@@ -159,7 +158,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { debounce } from 'quasar'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import peopleService from '@/services/people'
 
@@ -194,11 +192,11 @@ export default {
 
       // Apply search filter
       if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
+        const query = searchQuery.value.toLowerCase().trim()
         filtered = filtered.filter(person => 
           person.name.toLowerCase().includes(query) ||
           (person.name_ext && person.name_ext.toLowerCase().includes(query)) ||
-          (person.how_we_met && person.how_we_met.toLowerCase().includes(query))
+          (person.location && person.location.toLowerCase().includes(query))
         )
       }
 
@@ -241,10 +239,6 @@ export default {
         loading.value = false
       }
     }
-
-    const debouncedSearch = debounce(() => {
-      // Search is handled in computed property
-    }, 300)
 
     const formatDate = (dateString) => {
       if (!dateString) return 'Never'
@@ -328,7 +322,6 @@ export default {
       sortOptions,
       filteredPeople,
       loadPeople,
-      debouncedSearch,
       formatDate,
       viewPerson,
       copyEmail,
