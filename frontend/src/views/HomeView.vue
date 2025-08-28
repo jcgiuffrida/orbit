@@ -11,40 +11,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-      class="bg-grey-1"
-    >
-      <q-list>
-        <q-item-label header>Navigation</q-item-label>
-        <q-item clickable v-ripple :to="{ name: 'people' }">
-          <q-item-section avatar>
-            <q-icon name="people" />
-          </q-item-section>
-          <q-item-section>People</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple :to="{ name: 'conversations' }">
-          <q-item-section avatar>
-            <q-icon name="chat" />
-          </q-item-section>
-          <q-item-section>Conversations</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple :to="{ name: 'contact-attempts' }">
-          <q-item-section avatar>
-            <q-icon name="phone" />
-          </q-item-section>
-          <q-item-section>Contact Attempts</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple :to="{ name: 'relationships' }">
-          <q-item-section avatar>
-            <q-icon name="favorite" />
-          </q-item-section>
-          <q-item-section>Relationships</q-item-section>
-        </q-item>
-      </q-list>
-    </q-drawer>
+    <NavigationDrawer v-model="leftDrawerOpen" />
 
     <q-page-container>
       <q-page class="flex flex-center">
@@ -65,9 +32,13 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
 export default {
   name: 'HomeView',
+  components: {
+    NavigationDrawer
+  },
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()

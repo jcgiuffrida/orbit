@@ -9,30 +9,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item clickable :to="{ name: 'home' }">
-          <q-item-section avatar><q-icon name="home" /></q-item-section>
-          <q-item-section>Home</q-item-section>
-        </q-item>
-        <q-item clickable :to="{ name: 'people' }">
-          <q-item-section avatar><q-icon name="people" /></q-item-section>
-          <q-item-section>People</q-item-section>
-        </q-item>
-        <q-item clickable :to="{ name: 'conversations' }">
-          <q-item-section avatar><q-icon name="chat" /></q-item-section>
-          <q-item-section>Conversations</q-item-section>
-        </q-item>
-        <q-item clickable :to="{ name: 'contact-attempts' }">
-          <q-item-section avatar><q-icon name="phone" /></q-item-section>
-          <q-item-section>Contact Attempts</q-item-section>
-        </q-item>
-        <q-item clickable :to="{ name: 'relationships' }">
-          <q-item-section avatar><q-icon name="favorite" /></q-item-section>
-          <q-item-section>Relationships</q-item-section>
-        </q-item>
-      </q-list>
-    </q-drawer>
+    <NavigationDrawer v-model="leftDrawerOpen" />
 
     <q-page-container>
       <q-page class="q-pa-md">
@@ -47,9 +24,13 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
 export default {
   name: 'ContactAttemptsView',
+  components: {
+    NavigationDrawer
+  },
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()
