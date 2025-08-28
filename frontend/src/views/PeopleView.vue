@@ -20,7 +20,7 @@
             color="primary" 
             icon="add" 
             label="Add Person" 
-            @click="showAddDialog = true" 
+            @click="addPerson" 
           />
         </div>
 
@@ -67,7 +67,7 @@
             color="primary" 
             label="Add Your First Person" 
             class="q-mt-md"
-            @click="showAddDialog = true"
+            @click="addPerson"
           />
         </div>
 
@@ -135,20 +135,6 @@
           </div>
         </div>
 
-        <!-- Add Person Dialog -->
-        <q-dialog v-model="showAddDialog" persistent>
-          <q-card style="min-width: 400px">
-            <q-card-section>
-              <div class="text-h6">Add New Person</div>
-            </q-card-section>
-            <q-card-section class="q-pt-none">
-              <div class="text-body2">Coming soon...</div>
-            </q-card-section>
-            <q-card-actions align="right">
-              <q-btn flat label="Cancel" color="primary" @click="showAddDialog = false" />
-            </q-card-actions>
-          </q-card>
-        </q-dialog>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -170,7 +156,6 @@ const peopleStore = usePeopleStore()
 const leftDrawerOpen = ref(false)
 const searchQuery = ref('')
 const sortBy = ref('name')
-const showAddDialog = ref(false)
 
 // Options for sorting
 const sortOptions = [
@@ -305,6 +290,10 @@ const textPerson = (person) => {
       timeout: 3000
     })
   }
+}
+
+const addPerson = () => {
+  router.push({ name: 'person-edit', params: { id: 'new' } })
 }
 
 const addConversation = (person) => {

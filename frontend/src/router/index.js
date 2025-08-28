@@ -28,6 +28,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/people/:id/edit',
+      name: 'person-edit',
+      component: () => import('@/views/PersonEditView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/conversations',
       name: 'conversations', 
       component: () => import('@/views/ConversationsView.vue'),

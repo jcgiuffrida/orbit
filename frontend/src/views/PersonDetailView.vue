@@ -92,7 +92,6 @@
                   <div class="text-h6 q-mb-md">Contact Information</div>
                   
                   <div v-if="person.email" class="q-mb-sm">
-                    <div class="text-caption text-grey-7">Email</div>
                     <div class="text-body1">
                       <q-icon name="email" size="16px" class="q-mr-xs" />
                       {{ person.email }}
@@ -111,7 +110,6 @@
                   </div>
 
                   <div v-if="person.phone" class="q-mb-sm">
-                    <div class="text-caption text-grey-7">Phone</div>
                     <div class="text-body1">
                       <q-icon name="phone" size="16px" class="q-mr-xs" />
                       {{ person.phone }}
@@ -130,7 +128,6 @@
                   </div>
 
                   <div v-if="person.location" class="q-mb-sm">
-                    <div class="text-caption text-grey-7">Location</div>
                     <div class="text-body1">
                       <q-icon name="place" size="16px" class="q-mr-xs" />
                       {{ person.location }}
@@ -270,8 +267,9 @@ const goBack = () => {
 }
 
 const editPerson = () => {
-  // TODO: Navigate to edit view
-  console.log('Edit person:', person.value)
+  if (person.value) {
+    router.push({ name: 'person-edit', params: { id: person.value.id } })
+  }
 }
 
 const confirmDelete = async () => {
@@ -284,7 +282,7 @@ const confirmDelete = async () => {
     
     $q.notify({
       type: 'negative',
-      message: `🗑️ ${personName} deleted successfully`,
+      message: `${personName} deleted successfully`,
       position: 'top',
       timeout: 4000,
       actions: [{ icon: 'close', color: 'white', dense: true }]
