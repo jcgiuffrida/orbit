@@ -3,6 +3,7 @@ Base settings file.
 """
 from pathlib import Path
 import environ
+import re
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,7 +18,7 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -30,11 +31,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_vite',
     'orbit',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -48,7 +51,7 @@ ROOT_URLCONF = 'orbit.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'orbit' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,6 +104,20 @@ USE_I18N = False
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
+
+STATICFILES_DIRS = [
+    str(BASE_DIR / "frontend" / "dist"),
+]
+
+# The following is necessary when using django-vite with whitenoise
+# See https://github.com/MrBin99/django-vite#notes
+def immutable_file_test(path, url):
+    # Match filename with 8 characters before the extension
+    # e.g. WorkspacePage-lEHC0wV5.js
+    return re.match(r"^/static/.+-[\w-]{8}\.(js|css)$", url)
+
+WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -118,6 +135,18 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
+}
+
+# Django Vite
+DJANGO_VITE = {
+    'default': {
+        'dev_mode': DEBUG,
+        'dev_server_host': 'localhost',
+        'dev_server_port': 5173,
+        'ws_client_url': '@vite/client',
+        'manifest_path': BASE_DIR / 'frontend' / 'dist' / '.vite' / 'manifest.json',
+        'static_url_prefix': '',
+    }
 }
 
 # Import Jazzmin settings

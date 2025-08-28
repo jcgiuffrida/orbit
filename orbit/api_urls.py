@@ -1,13 +1,20 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PersonViewSet, ConversationViewSet, ContactAttemptViewSet, RelationshipViewSet
+from .views import (
+    PersonViewSet, ConversationViewSet, ContactAttemptViewSet, RelationshipViewSet,
+    current_user, login_view, logout_view, csrf_token
+)
 
 router = DefaultRouter()
-router.register('people', PersonViewSet)
-router.register('conversations', ConversationViewSet)
-router.register('contact-attempts', ContactAttemptViewSet)
-router.register('relationships', RelationshipViewSet)
+router.register('people', PersonViewSet, basename='person')
+router.register('conversations', ConversationViewSet, basename='conversation')
+router.register('contact-attempts', ContactAttemptViewSet, basename='contactattempt')
+router.register('relationships', RelationshipViewSet, basename='relationship')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('auth/user/', current_user, name='current-user'),
+    path('auth/login/', login_view, name='login'),
+    path('auth/logout/', logout_view, name='logout'),
+    path('auth/csrf/', csrf_token, name='csrf-token'),
 ]

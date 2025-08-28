@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import uuid
 
 
@@ -12,6 +13,7 @@ class Person(models.Model):
     how_we_met = models.TextField(blank=True)
     notes = models.TextField(blank=True)
     ai_summary = models.TextField(blank=True)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='created_people')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -41,6 +43,8 @@ class Conversation(models.Model):
     type = models.CharField(choices=CONVERSATION_TYPES)
     location = models.CharField(blank=True)
     notes = models.TextField()
+    private = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='created_conversations')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -66,6 +70,8 @@ class ContactAttempt(models.Model):
     type = models.CharField(choices=ATTEMPT_TYPES)
     notes = models.TextField(blank=True)
     led_to_conversation = models.ForeignKey(Conversation, on_delete=models.SET_NULL, blank=True, null=True)
+    private = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='created_contact_attempts')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -90,6 +96,7 @@ class Relationship(models.Model):
     person2 = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationships_as_person2')
     relationship_type = models.CharField(choices=RELATIONSHIP_TYPES)
     description = models.CharField(blank=True)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='created_relationships')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

@@ -1,0 +1,111 @@
+{
+  "_QLayout-DsXrEGCF.js": {
+    "file": "assets/QLayout-DsXrEGCF.js",
+    "name": "QLayout",
+    "imports": [
+      "src/main.js",
+      "_use-dark-BgMXnwAY.js"
+    ]
+  },
+  "_use-dark-BgMXnwAY.js": {
+    "file": "assets/use-dark-BgMXnwAY.js",
+    "name": "use-dark",
+    "imports": [
+      "src/main.js"
+    ]
+  },
+  "node_modules/@quasar/extras/material-icons/web-font/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.woff": {
+    "file": "assets/flUhRq6tzZclQEJ-Vdg-IuiaDsNa-Dr0goTwe.woff",
+    "src": "node_modules/@quasar/extras/material-icons/web-font/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.woff"
+  },
+  "node_modules/@quasar/extras/material-icons/web-font/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2": {
+    "file": "assets/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ-D-x-0Q06.woff2",
+    "src": "node_modules/@quasar/extras/material-icons/web-font/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2"
+  },
+  "src/main.js": {
+    "file": "assets/main-Bt3txZRL.js",
+    "name": "main",
+    "src": "src/main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "src/views/HomeView.vue",
+      "src/views/LoginView.vue",
+      "src/views/PeopleView.vue",
+      "src/views/ConversationsView.vue",
+      "src/views/ContactAttemptsView.vue",
+      "src/views/RelationshipsView.vue"
+    ],
+    "css": [
+      "assets/main-DRVptBDW.css"
+    ],
+    "assets": [
+      "assets/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ-D-x-0Q06.woff2",
+      "assets/flUhRq6tzZclQEJ-Vdg-IuiaDsNa-Dr0goTwe.woff"
+    ]
+  },
+  "src/views/ContactAttemptsView.vue": {
+    "file": "assets/ContactAttemptsView-HTXTWSCW.js",
+    "name": "ContactAttemptsView",
+    "src": "src/views/ContactAttemptsView.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_use-dark-BgMXnwAY.js",
+      "_QLayout-DsXrEGCF.js",
+      "src/main.js"
+    ]
+  },
+  "src/views/ConversationsView.vue": {
+    "file": "assets/ConversationsView-D56OMsie.js",
+    "name": "ConversationsView",
+    "src": "src/views/ConversationsView.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_use-dark-BgMXnwAY.js",
+      "_QLayout-DsXrEGCF.js",
+      "src/main.js"
+    ]
+  },
+  "src/views/HomeView.vue": {
+    "file": "assets/HomeView-D8SkXdvH.js",
+    "name": "HomeView",
+    "src": "src/views/HomeView.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_QLayout-DsXrEGCF.js",
+      "_use-dark-BgMXnwAY.js",
+      "src/main.js"
+    ]
+  },
+  "src/views/LoginView.vue": {
+    "file": "assets/LoginView-Bi5vCiqG.js",
+    "name": "LoginView",
+    "src": "src/views/LoginView.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.js",
+      "_use-dark-BgMXnwAY.js"
+    ]
+  },
+  "src/views/PeopleView.vue": {
+    "file": "assets/PeopleView-D5Dn7Bmr.js",
+    "name": "PeopleView",
+    "src": "src/views/PeopleView.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_use-dark-BgMXnwAY.js",
+      "_QLayout-DsXrEGCF.js",
+      "src/main.js"
+    ]
+  },
+  "src/views/RelationshipsView.vue": {
+    "file": "assets/RelationshipsView-CTPOZnzT.js",
+    "name": "RelationshipsView",
+    "src": "src/views/RelationshipsView.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_use-dark-BgMXnwAY.js",
+      "_QLayout-DsXrEGCF.js",
+      "src/main.js"
+    ]
+  }
+}

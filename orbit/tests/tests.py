@@ -1,6 +1,6 @@
 from django.test import TestCase
 from datetime import date, timedelta
-from .models import Person, Conversation, ContactAttempt, Relationship
+from orbit.models import Person, Conversation, ContactAttempt, Relationship
 
 
 class PersonModelTest(TestCase):

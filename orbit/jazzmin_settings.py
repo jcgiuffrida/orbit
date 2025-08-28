@@ -7,14 +7,14 @@ JAZZMIN_SETTINGS = {
     "site_logo": None,
     "login_logo": None,
     "welcome_sign": "Welcome to Orbit",
-    "copyright": "Family Personal Use",
+    "copyright": "Bunnyland",
     "search_model": ["orbit.Person", "orbit.Conversation"],
     "user_avatar": None,
     
     # Top Menu
     "topmenu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"model": "auth.User"},
+        {"name": "Home", "url": "frontend"},
+        {"name": "Admin", "url": "admin:index", "permissions": ["auth.view_user"]},
     ],
 
     # User Menu on the right side of the header
