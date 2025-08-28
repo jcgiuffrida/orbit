@@ -5,7 +5,6 @@
         <q-toolbar-title>
           Orbit
         </q-toolbar-title>
-        <div>Hello, {{ authStore.user?.username }}</div>
         <q-space />
         <q-btn flat round dense icon="logout" @click="handleLogout" />
       </q-toolbar>
