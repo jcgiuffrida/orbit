@@ -36,45 +36,32 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-export default {
-  name: 'LoginView',
-  setup() {
-    const router = useRouter()
-    const authStore = useAuthStore()
-    
-    const username = ref('')
-    const password = ref('')
-    const error = ref('')
+const router = useRouter()
+const authStore = useAuthStore()
 
-    const handleSubmit = async () => {
-      error.value = ''
-      
-      if (!username.value || !password.value) {
-        error.value = 'Please enter username and password'
-        return
-      }
+const username = ref('')
+const password = ref('')
+const error = ref('')
 
-      const result = await authStore.login(username.value, password.value)
-      
-      if (result.success) {
-        router.push({ name: 'home' })
-      } else {
-        error.value = result.error
-      }
-    }
+const handleSubmit = async () => {
+  error.value = ''
+  
+  if (!username.value || !password.value) {
+    error.value = 'Please enter username and password'
+    return
+  }
 
-    return {
-      username,
-      password,
-      error,
-      authStore,
-      handleSubmit
-    }
+  const result = await authStore.login(username.value, password.value)
+  
+  if (result.success) {
+    router.push({ name: 'home' })
+  } else {
+    error.value = result.error
   }
 }
 </script>

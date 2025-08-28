@@ -19,38 +19,30 @@
   </q-drawer>
 </template>
 
-<script>
+<script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-export default {
-  name: 'NavigationDrawer',
-  props: {
-    modelValue: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['update:modelValue'],
-  setup() {
-    const route = useRoute()
-
-    const navigationItems = [
-      { name: 'home', label: 'Dashboard', icon: 'home' },
-      { name: 'people', label: 'People', icon: 'people' },
-      { name: 'conversations', label: 'Conversations', icon: 'chat' },
-      { name: 'contact-attempts', label: 'Contact Attempts', icon: 'phone' },
-      { name: 'relationships', label: 'Relationships', icon: 'favorite' }
-    ]
-
-    const isActive = computed(() => (routeName) => {
-      return route.name === routeName
-    })
-
-    return {
-      navigationItems,
-      isActive
-    }
+defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false
   }
-}
+})
+
+defineEmits(['update:modelValue'])
+
+const route = useRoute()
+
+const navigationItems = [
+  { name: 'home', label: 'Home', icon: 'home' },
+  { name: 'people', label: 'People', icon: 'people' },
+  { name: 'conversations', label: 'Conversations', icon: 'chat' },
+  { name: 'contact-attempts', label: 'Contact Attempts', icon: 'phone' },
+  { name: 'relationships', label: 'Relationships', icon: 'favorite' }
+]
+
+const isActive = computed(() => (routeName) => {
+  return route.name === routeName
+})
 </script>

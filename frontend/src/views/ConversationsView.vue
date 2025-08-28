@@ -20,32 +20,18 @@
   </q-layout>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
-export default {
-  name: 'ConversationsView',
-  components: {
-    NavigationDrawer
-  },
-  setup() {
-    const router = useRouter()
-    const authStore = useAuthStore()
-    const leftDrawerOpen = ref(false)
+const router = useRouter()
+const authStore = useAuthStore()
+const leftDrawerOpen = ref(false)
 
-    const handleLogout = async () => {
-      await authStore.logout()
-      router.push({ name: 'login' })
-    }
-
-    return {
-      leftDrawerOpen,
-      authStore,
-      handleLogout
-    }
-  }
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push({ name: 'login' })
 }
 </script>
