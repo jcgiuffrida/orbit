@@ -52,7 +52,7 @@
         </div>
 
         <!-- People Grid -->
-        <div v-if="loading" class="text-center q-pa-lg">
+        <div v-if="peopleStore.isLoading" class="text-center q-pa-lg">
           <q-spinner-dots size="50px" color="primary" />
           <div class="q-mt-md">Loading people...</div>
         </div>
@@ -157,17 +157,17 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { useAuthStore } from '@/stores/auth'
+import { usePeopleStore } from '@/stores/people'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
-import peopleService from '@/services/people'
 
 const router = useRouter()
+const $q = useQuasar()
 const authStore = useAuthStore()
-const leftDrawerOpen = ref(false)
+const peopleStore = usePeopleStore()
 
-// Data
-const people = ref([])
-const loading = ref(true)
+const leftDrawerOpen = ref(false)
 const searchQuery = ref('')
 const sortBy = ref('name')
 const showAddDialog = ref(false)
@@ -182,7 +182,7 @@ const sortOptions = [
 
 // Computed
 const filteredPeople = computed(() => {
-  let filtered = [...people.value]
+  let filtered = [...peopleStore.getPeopleList]
 
   // Apply search filter
   if (searchQuery.value) {
@@ -221,15 +221,12 @@ const filteredPeople = computed(() => {
 
 // Methods
 const loadPeople = async () => {
-  loading.value = true
   try {
-    const response = await peopleService.getAll()
-    people.value = response.results || response
+    // Force refresh if we only have 1 person (likely from direct detail page navigation)
+    const shouldForceRefresh = peopleStore.peopleCount === 1
+    await peopleStore.fetchPeople(shouldForceRefresh)
   } catch (error) {
     console.error('Error loading people:', error)
-    people.value = []
-  } finally {
-    loading.value = false
   }
 }
 
@@ -258,32 +255,55 @@ const formatDate = (dateString) => {
 
 const copyEmail = async (person) => {
   if (!person.email) {
-    // TODO: Show notification that no email is available
-    console.log('No email address for', person.name)
+    $q.notify({
+      type: 'warning',
+      message: `No email address available for ${person.name}`,
+      position: 'top',
+      timeout: 3000
+    })
     return
   }
   
   try {
     await navigator.clipboard.writeText(person.email)
-    // TODO: Show success notification
-    console.log('Email copied:', person.email)
+    $q.notify({
+      type: 'positive',
+      message: `Email copied: ${person.email}`,
+      position: 'top',
+      timeout: 3000,
+      actions: [{ icon: 'close', color: 'white', dense: true }]
+    })
   } catch (error) {
     console.error('Failed to copy email:', error)
-    // TODO: Show error notification
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to copy email address',
+      position: 'top',
+      timeout: 3000
+    })
   }
 }
 
 const viewPerson = (person) => {
-  // TODO: Navigate to person detail view
-  console.log('View person:', person)
+  router.push({ name: 'person-detail', params: { id: person.id } })
 }
 
 const textPerson = (person) => {
   if (person.phone) {
     window.open(`sms:${person.phone}`)
+    $q.notify({
+      type: 'info',
+      message: `Opening SMS to ${person.name}`,
+      position: 'top',
+      timeout: 2000
+    })
   } else {
-    // TODO: Show notification that no phone number is available
-    console.log('No phone number for', person.name)
+    $q.notify({
+      type: 'warning',
+      message: `No phone number available for ${person.name}`,
+      position: 'top',
+      timeout: 3000
+    })
   }
 }
 
@@ -294,6 +314,12 @@ const addConversation = (person) => {
 
 const handleLogout = async () => {
   await authStore.logout()
+  $q.notify({
+    type: 'info',
+    message: '👋 Logged out successfully',
+    position: 'top',
+    timeout: 2000
+  })
   router.push({ name: 'login' })
 }
 

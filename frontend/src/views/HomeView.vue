@@ -30,15 +30,23 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { useAuthStore } from '@/stores/auth'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
 const router = useRouter()
+const $q = useQuasar()
 const authStore = useAuthStore()
 const leftDrawerOpen = ref(false)
 
 const handleLogout = async () => {
   await authStore.logout()
+  $q.notify({
+    type: 'info',
+    message: 'Logged out successfully',
+    position: 'top',
+    timeout: 2000
+  })
   router.push({ name: 'login' })
 }
 </script>
