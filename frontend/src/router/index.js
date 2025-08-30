@@ -45,12 +45,6 @@ const router = createRouter({
       component: () => import('@/views/ContactAttemptsView.vue'),
       meta: { requiresAuth: true }
     },
-    {
-      path: '/relationships',
-      name: 'relationships',
-      component: () => import('@/views/RelationshipsView.vue'),
-      meta: { requiresAuth: true }
-    }
   ]
 })
 

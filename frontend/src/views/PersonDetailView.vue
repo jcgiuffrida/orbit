@@ -198,7 +198,7 @@
               </q-card>
 
               <!-- Quick Actions -->
-              <q-card class="content-card" flat bordered>
+              <q-card class="content-card q-mb-lg" flat bordered>
                 <q-card-section class="q-pa-lg">
                   <div class="text-h6 q-mb-md text-weight-medium">Quick Actions</div>
                   
@@ -238,12 +238,19 @@
                   </div>
                 </q-card-section>
               </q-card>
+
+              <!-- Relationships -->
+              <PersonRelationships 
+                :key="person.id"
+                :person-id="person.id"
+                :person-name="person.name"
+              />
             </div>
           </div>
         </div>
 
         <!-- Delete Confirmation Dialog -->
-        <q-dialog v-model="showDeleteDialog" persistent>
+        <q-dialog v-model="showDeleteDialog">
           <q-card>
             <q-card-section class="row items-center">
               <q-avatar icon="warning" color="negative" text-color="white" />
@@ -264,12 +271,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useAuthStore } from '@/stores/auth'
 import { usePeopleStore } from '@/stores/people'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import PersonRelationships from '@/components/PersonRelationships.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -417,6 +425,13 @@ const handleLogout = async () => {
   })
   router.push({ name: 'login' })
 }
+
+// Watch for route parameter changes
+watch(() => route.params.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    loadPerson()
+  }
+})
 
 // Lifecycle
 onMounted(() => {

@@ -38,8 +38,7 @@ const navigationItems = [
   { name: 'home', label: 'Home', icon: 'home' },
   { name: 'people', label: 'People', icon: 'people' },
   { name: 'conversations', label: 'Conversations', icon: 'chat' },
-  { name: 'contact-attempts', label: 'Contact Attempts', icon: 'phone' },
-  { name: 'relationships', label: 'Relationships', icon: 'favorite' }
+  { name: 'contact-attempts', label: 'Contact Attempts', icon: 'phone' }
 ]
 
 const isActive = computed(() => (routeName) => {
