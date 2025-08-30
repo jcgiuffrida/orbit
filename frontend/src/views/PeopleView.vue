@@ -70,8 +70,8 @@
             :key="person.id"
             class="col-12 col-sm-6 col-md-4 col-lg-3"
           >
-            <q-card class="person-card full-height cursor-pointer" @click="viewPerson(person)">
-              <q-card-section>
+            <q-card class="person-card full-height cursor-pointer flex column" @click="viewPerson(person)">
+              <q-card-section class="flex-grow-1">
                 <div class="text-h6 q-mb-xs">{{ person.name }}</div>
                 <div v-if="person.name_ext" class="text-caption text-grey-7 q-mb-sm">
                   {{ person.name_ext }}
@@ -80,8 +80,8 @@
                   <q-icon name="place" size="16px" class="q-mr-xs" />
                   {{ person.location }}
                 </div>
-                <div v-if="person.last_contacted" class="text-caption text-accent">
-                  <q-icon name="schedule" size="14px" class="q-mr-xs" />
+                <div v-if="person.last_contacted" class="text-caption" :class="getLastContactTextClass(person.last_contacted)">
+                  <q-icon name="schedule" size="14px" class="q-mr-xs" :color="getLastContactColor(person.last_contacted)" />
                   Last contact: {{ formatDate(person.last_contacted) }}
                 </div>
                 <div v-else class="text-caption text-grey-6">
@@ -293,6 +293,32 @@ const addConversation = (person) => {
   console.log('Add conversation with:', person)
 }
 
+const getLastContactColor = (dateString) => {
+  if (!dateString) return 'grey-6'
+  
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = now - date
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays <= 60) return 'positive'      // Past 2 months
+  if (diffDays <= 180) return 'grey-7'      // Past 6 months (neutral)
+  return 'negative'                          // Older than 6 months
+}
+
+const getLastContactTextClass = (dateString) => {
+  if (!dateString) return 'text-grey-6'
+  
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = now - date
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays <= 60) return 'text-positive'    // Past 2 months
+  if (diffDays <= 180) return 'text-grey-8'     // Past 6 months (neutral)
+  return 'text-negative'                         // Older than 6 months
+}
+
 
 // Lifecycle
 onMounted(() => {
@@ -323,5 +349,20 @@ onMounted(() => {
 .person-card .q-card__actions .q-btn {
   min-width: 40px;
   min-height: 40px;
+}
+
+/* Ensure full height flexbox works */
+.person-card.full-height {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.person-card .q-card__section {
+  flex: 1;
+}
+
+.person-card .q-card__actions {
+  flex: none;
 }
 </style>

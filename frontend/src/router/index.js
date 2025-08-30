@@ -63,6 +63,18 @@ const router = createRouter({
       component: () => import('@/views/ContactAttemptsView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/contact-attempts/new',
+      name: 'contact-attempt-create',
+      component: () => import('@/views/ContactAttemptCreateView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/contact-attempts/:id/edit',
+      name: 'contact-attempt-edit',
+      component: () => import('@/views/ContactAttemptCreateView.vue'),
+      meta: { requiresAuth: true }
+    },
   ]
 })
 

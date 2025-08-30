@@ -46,7 +46,7 @@
           <div class="breadcrumb-nav q-mb-md">
             <q-breadcrumbs class="text-grey-6">
               <q-breadcrumbs-el icon="chat" label="Conversations" @click="goBack" class="cursor-pointer" />
-              <q-breadcrumbs-el :label="getParticipantNames(conversation.participants)" />
+              <q-breadcrumbs-el :label="`${getParticipantNames(conversation.participants)} - ${formatDateLong(conversation.date)}`" />
             </q-breadcrumbs>
           </div>
 
@@ -170,7 +170,7 @@
                   <div 
                     v-for="participant in conversation.participants" 
                     :key="participant.id"
-                    class="participant-item q-mb-md"
+                    class="participant-item"
                   >
                     <div class="row items-center q-gutter-sm cursor-pointer" @click="viewParticipant(participant)">
                       <q-avatar size="32px" color="grey-4" text-color="grey-8">
@@ -438,8 +438,6 @@ onMounted(() => {
 .participant-item:hover {
   background-color: rgba(0, 0, 0, 0.02);
   border-radius: 8px;
-  margin: 0 -8px;
-  padding: 8px;
 }
 
 .action-buttons .q-btn {

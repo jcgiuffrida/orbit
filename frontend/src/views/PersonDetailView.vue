@@ -78,6 +78,14 @@
                     />
                     <q-btn 
                       outline
+                      color="secondary" 
+                      icon="contact_phone" 
+                      label="Quick Contact"
+                      class="q-mr-sm"
+                      @click="addContactAttempt"
+                    />
+                    <q-btn 
+                      outline
                       color="primary" 
                       icon="edit" 
                       label="Edit"
@@ -160,9 +168,9 @@
 
                   <div v-if="person.last_contacted" class="contact-item q-mb-md">
                     <div class="row items-center q-gutter-sm">
-                      <q-icon name="schedule" size="20px" color="positive" />
+                      <q-icon name="schedule" size="20px" :color="getLastContactColor(person.last_contacted)" />
                       <div class="col">
-                        <div class="text-body1 text-positive">{{ formatDate(person.last_contacted) }}</div>
+                        <div class="text-body1" :class="getLastContactTextClass(person.last_contacted)">{{ formatDate(person.last_contacted) }}</div>
                         <div class="text-caption text-grey-6">Last Contact</div>
                       </div>
                     </div>
@@ -172,9 +180,8 @@
                   <div v-if="person.how_we_met" class="contact-item">
                     <div class="row items-start q-gutter-sm">
                       <q-icon name="handshake" size="18px" color="grey-6" />
-                      <div class="col">
+                      <div class="col q-ml-sm">
                         <div class="text-body2 text-grey-7">{{ person.how_we_met }}</div>
-                        <div class="text-caption text-grey-5">How we met</div>
                       </div>
                     </div>
                   </div>
@@ -416,6 +423,15 @@ const addConversation = () => {
   }
 }
 
+const addContactAttempt = () => {
+  if (person.value) {
+    router.push({ 
+      name: 'contact-attempt-create', 
+      query: { person: person.value.id } 
+    })
+  }
+}
+
 const formatDate = (dateString) => {
   if (!dateString) return 'Never'
   const date = new Date(dateString)
@@ -485,6 +501,32 @@ const getConversationTypeColor = (type) => {
 
 const viewConversation = (conversation) => {
   router.push({ name: 'conversation-detail', params: { id: conversation.id } })
+}
+
+const getLastContactColor = (dateString) => {
+  if (!dateString) return 'grey-6'
+  
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = now - date
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays <= 60) return 'positive'      // Past 2 months
+  if (diffDays <= 180) return 'grey-7'      // Past 6 months (neutral)
+  return 'negative'                          // Older than 6 months
+}
+
+const getLastContactTextClass = (dateString) => {
+  if (!dateString) return 'text-grey-6'
+  
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = now - date
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays <= 60) return 'text-positive'    // Past 2 months
+  if (diffDays <= 180) return 'text-grey-8'     // Past 6 months (neutral)
+  return 'text-negative'                         // Older than 6 months
 }
 
 
