@@ -70,7 +70,7 @@
                 <div class="col-auto">
                   <div class="action-buttons">
                     <q-btn 
-                      color="primary" 
+                      color="secondary" 
                       icon="chat_bubble" 
                       label="Log Conversation"
                       class="q-mr-sm"
@@ -80,7 +80,7 @@
                       outline
                       color="secondary" 
                       icon="contact_phone" 
-                      label="Quick Contact"
+                      label="Ping"
                       class="q-mr-sm"
                       @click="addContactAttempt"
                     />
