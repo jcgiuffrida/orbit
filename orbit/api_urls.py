@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     PersonViewSet, ConversationViewSet, ContactAttemptViewSet, RelationshipViewSet,
-    current_user, login_view, logout_view, csrf_token
+    current_user, login_view, logout_view, csrf_token, dashboard_analytics
 )
 
 router = DefaultRouter()
@@ -13,6 +13,7 @@ router.register('relationships', RelationshipViewSet, basename='relationship')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('dashboard/', dashboard_analytics, name='dashboard-analytics'),
     path('auth/user/', current_user, name='current-user'),
     path('auth/login/', login_view, name='login'),
     path('auth/logout/', logout_view, name='logout'),

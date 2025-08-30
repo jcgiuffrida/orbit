@@ -145,13 +145,13 @@
                       <q-btn 
                         unelevated
                         size="sm" 
-                        icon="sms" 
-                        color="positive"
+                        icon="content_copy" 
+                        color="info"
                         text-color="white"
-                        @click="textPerson"
+                        @click="copyPhone"
                         class="contact-action-btn"
                       >
-                        <q-tooltip>Send Text</q-tooltip>
+                        <q-tooltip>Copy Phone</q-tooltip>
                       </q-btn>
                     </div>
                   </div>
@@ -196,17 +196,24 @@
                 </q-card-section>
               </q-card>
 
-              <!-- AI Summary -->
-              <q-card v-if="person.ai_summary" class="content-card" flat bordered>
-                <q-card-section class="q-pa-lg">
-                  <div class="text-h6 q-mb-md text-weight-medium">AI Summary</div>
-                  <div class="text-body1 text-grey-8 pre-line ai-summary-text">{{ person.ai_summary }}</div>
-                </q-card-section>
-              </q-card>
+              <!-- Relationships -->
+              <PersonRelationships 
+                :key="person.id"
+                :person-id="person.id"
+                :person-name="person.name"
+              />
             </div>
 
             <!-- Right Column - Conversations -->
             <div class="col-12 col-md-6">
+              <!-- AI Summary -->
+              <q-card v-if="person.ai_summary" class="content-card q-mb-lg" flat bordered>
+                <q-card-section class="q-pa-lg">
+                  <div class="text-h6 q-mb-md text-weight-medium">Conversation History</div>
+                  <div class="text-body1 text-grey-8 pre-line ai-summary-text">{{ person.ai_summary }}</div>
+                </q-card-section>
+              </q-card>
+              
               <!-- Conversations -->
               <q-card class="content-card q-mb-lg" flat bordered>
                 <q-card-section class="q-pa-lg">
@@ -254,13 +261,6 @@
                   </div>
                 </q-card-section>
               </q-card>
-
-              <!-- Relationships -->
-              <PersonRelationships 
-                :key="person.id"
-                :person-id="person.id"
-                :person-name="person.name"
-              />
             </div>
           </div>
         </div>
@@ -402,14 +402,25 @@ const copyEmail = async () => {
   }
 }
 
-const textPerson = () => {
-  if (person.value?.phone) {
-    window.open(`sms:${person.value.phone}`)
+const copyPhone = async () => {
+  if (!person.value?.phone) return
+
+  try {
+    await navigator.clipboard.writeText(person.value.phone)
     $q.notify({
-      type: 'info',
-      message: `Opening SMS to ${person.value.name}`,
+      type: 'positive',
+      message: `Phone number copied: ${person.value.phone}`,
       position: 'top',
-      timeout: 2000
+      timeout: 3000,
+      actions: [{ icon: 'close', color: 'white', dense: true }]
+    })
+  } catch (error) {
+    console.error('Failed to copy phone number:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to copy phone number',
+      position: 'top',
+      timeout: 3000
     })
   }
 }

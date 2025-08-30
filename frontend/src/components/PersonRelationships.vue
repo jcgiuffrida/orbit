@@ -23,15 +23,6 @@
       <div v-else-if="relationships.length === 0" class="text-center q-pa-lg">
         <q-icon name="people_outline" size="48px" color="grey-5" />
         <div class="text-body2 text-grey-6 q-mt-sm">No relationships recorded</div>
-        <q-btn 
-          outline
-          color="primary" 
-          icon="add" 
-          label="Add First Relationship"
-          size="sm"
-          class="q-mt-md"
-          @click="openAddDialog"
-        />
       </div>
 
       <!-- Relationships List -->

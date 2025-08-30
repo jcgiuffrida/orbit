@@ -1,19 +1,44 @@
 from rest_framework import serializers
 from .models import Person, Conversation, ContactAttempt, Relationship
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.db.models import Count, Q
 
 
 class PersonSerializer(serializers.ModelSerializer):
     last_contacted = serializers.DateField(read_only=True)
     created_by_username = serializers.ReadOnlyField(source='created_by.username')
+    conversation_count = serializers.SerializerMethodField()
+    conversation_count_recent = serializers.SerializerMethodField()
+    days_since_last_contact = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
         fields = [
             'id', 'name', 'name_ext', 'email', 'phone', 'location', 'birthday',
             'how_we_met', 'notes', 'ai_summary', 'created_by_username', 
-            'created_at', 'last_contacted'
+            'created_at', 'last_contacted', 'conversation_count', 
+            'conversation_count_recent', 'days_since_last_contact'
         ]
-        read_only_fields = ['created_at', 'last_contacted', 'created_by_username']
+        read_only_fields = [
+            'created_at', 'last_contacted', 'created_by_username', 
+            'conversation_count', 'conversation_count_recent', 'days_since_last_contact'
+        ]
+
+    def get_conversation_count(self, obj):
+        """Total conversation count"""
+        return obj.conversations.count()
+
+    def get_conversation_count_recent(self, obj):
+        """Conversation count in past 2 years"""
+        two_years_ago = timezone.now().date() - timedelta(days=365*2)
+        return obj.conversations.filter(date__gte=two_years_ago).count()
+
+    def get_days_since_last_contact(self, obj):
+        """Days since last conversation"""
+        if obj.last_contacted:
+            return (timezone.now().date() - obj.last_contacted).days
+        return None
 
 
 class ConversationSerializer(serializers.ModelSerializer):

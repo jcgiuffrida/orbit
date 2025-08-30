@@ -5,14 +5,182 @@
     <NavigationDrawer v-model="leftDrawerOpen" />
 
     <q-page-container>
-      <q-page class="flex flex-center">
-        <div class="text-center">
-          <h1 class="text-h6 q-mb-md">Welcome to Orbit</h1>
-          <p class="text-body1">Track your personal connections and conversations.</p>
-          <q-btn-group class="q-mt-lg">
-            <q-btn color="primary" :to="{ name: 'people' }" label="View People" />
-            <q-btn color="secondary" :to="{ name: 'conversations' }" label="View Conversations" />
-          </q-btn-group>
+      <q-page class="q-pa-md">
+        <div v-if="loading" class="flex flex-center q-mt-lg">
+          <q-spinner size="2em" />
+        </div>
+        
+        <div v-else-if="error" class="text-center q-mt-lg">
+          <q-icon name="error" size="2em" color="negative" />
+          <div class="text-h6 q-mt-md">Failed to load dashboard</div>
+          <div class="text-body2">{{ error }}</div>
+          <q-btn @click="loadDashboard" color="primary" class="q-mt-md">Retry</q-btn>
+        </div>
+
+        <div v-else>
+          <!-- Page Header with Actions -->
+          <div class="row items-center q-mb-lg">
+            <div class="col">
+              <h1 class="text-h4 q-ma-none">Dashboard</h1>
+            </div>
+            <div class="col-auto">
+              <div class="q-gutter-sm">
+                <q-btn 
+                  color="primary"
+                  icon="add_comment" 
+                  :to="{ name: 'conversation-create' }"
+                  label="New Conversation"
+                />
+                <q-btn 
+                  color="secondary"
+                  icon="contact_phone" 
+                  :to="{ name: 'contact-attempt-create' }"
+                  label="New Ping"
+                />
+                <q-btn 
+                  color="accent"
+                  icon="person_add" 
+                  :to="{ name: 'person-create' }"
+                  label="Add Person"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <!-- Monthly Activity Chart -->
+          <div class="row q-mb-lg">
+            <div class="col-12">
+              <q-card>
+                <q-card-section>
+                  <div class="text-h6">Activity Over Past 6 Months</div>
+                </q-card-section>
+                <q-card-section>
+                  <WeeklyActivityChart :data="dashboardData.monthly_activity" />
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+
+          <!-- Activity Overview -->
+          <div class="row q-mb-lg">
+            <div class="col-12">
+              <q-card>
+                <q-card-section>
+                  <div class="text-h6">Activity Overview</div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-col-gutter-md">
+                    <div class="col">
+                      <div class="text-caption">Past Week</div>
+                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.week }} conversations</div>
+                      <div v-if="dashboardData.activity_overview.contact_attempts.week > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.week }} contact attempts</div>
+                    </div>
+                    <div class="col">
+                      <div class="text-caption">Past Month</div>
+                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.month }} conversations</div>
+                      <div v-if="dashboardData.activity_overview.contact_attempts.month > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.month }} contact attempts</div>
+                    </div>
+                    <div class="col">
+                      <div class="text-caption">Past Year</div>
+                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.year }} conversations</div>
+                      <div v-if="dashboardData.activity_overview.contact_attempts.year > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.year }} contact attempts</div>
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+
+          <!-- Recent Conversations and Top Contacts -->
+          <div class="row q-col-gutter-md q-mb-lg">
+            <div class="col-12 col-md-6">
+              <q-card>
+                <q-card-section>
+                  <div class="text-h6">Recent Conversations</div>
+                </q-card-section>
+                <q-card-section>
+                  <q-list separator>
+                    <q-item 
+                      v-for="conversation in dashboardData.recent_conversations.slice(0, 5)" 
+                      :key="conversation.id"
+                      :to="{ name: 'conversation-detail', params: { id: conversation.id } }"
+                      clickable
+                    >
+                      <q-item-section>
+                        <q-item-label>{{ formatDate(conversation.date) }}</q-item-label>
+                        <q-item-label caption>
+                          {{ conversation.participants.map(p => p.name).join(', ') }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-card-section>
+                <q-card-actions align="center">
+                  <q-btn flat :to="{ name: 'conversations' }">View all</q-btn>
+                </q-card-actions>
+              </q-card>
+            </div>
+            
+            <div class="col-12 col-md-6">
+              <q-card>
+                <q-card-section>
+                  <div class="text-h6">Top Contacts (1-2 yrs)</div>
+                </q-card-section>
+                <q-card-section>
+                  <q-list separator>
+                    <q-item 
+                      v-for="person in dashboardData.top_contacts.slice(0, 5)" 
+                      :key="person.id"
+                      :to="{ name: 'person-detail', params: { id: person.id } }"
+                      clickable
+                    >
+                      <q-item-section>
+                        <q-item-label>{{ person.name }}</q-item-label>
+                        <q-item-label caption>
+                          {{ person.conversation_count_recent }} {{ pluralize(person.conversation_count_recent, 'conversation', 'conversations') }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-card-section>
+                <q-card-actions align="center">
+                  <q-btn flat :to="{ name: 'people' }">View all</q-btn>
+                </q-card-actions>
+              </q-card>
+            </div>
+          </div>
+
+          <!-- People to Reach Out -->
+          <div class="row">
+            <div class="col-12">
+              <q-card>
+                <q-card-section>
+                  <div class="text-h6">People to Reach Out</div>
+                </q-card-section>
+                <q-card-section v-if="dashboardData.people_to_reach_out.length === 0">
+                  <div class="text-body2 text-grey-6">Great! You're up to date with everyone.</div>
+                </q-card-section>
+                <q-card-section v-else>
+                  <div class="row q-col-gutter-md">
+                    <div 
+                      v-for="person in dashboardData.people_to_reach_out" 
+                      :key="person.id"
+                      class="col-12 col-sm-6 col-md-4"
+                    >
+                      <q-card class="cursor-pointer" @click="$router.push({ name: 'person-detail', params: { id: person.id } })">
+                        <q-card-section>
+                          <div class="text-h6">{{ person.name }}</div>
+                          <div class="text-caption text-grey-6" v-if="person.days_since_last_contact">
+                            {{ person.days_since_last_contact }} days ago
+                          </div>
+                        </q-card-section>
+                      </q-card>
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
         </div>
       </q-page>
     </q-page-container>
@@ -20,9 +188,45 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import api from '@/services/api'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import WeeklyActivityChart from '@/components/WeeklyActivityChart.vue'
 
 const leftDrawerOpen = ref(false)
+const dashboardData = ref({})
+const loading = ref(true)
+const error = ref(null)
+
+const loadDashboard = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    const response = await api.get('/dashboard/')
+    dashboardData.value = response.data
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to load dashboard data'
+    console.error('Dashboard load error:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { 
+    weekday: 'short',
+    month: 'short', 
+    day: 'numeric'
+  })
+}
+
+const pluralize = (count, singular, plural) => {
+  return count === 1 ? singular : plural
+}
+
+onMounted(() => {
+  loadDashboard()
+})
 </script>

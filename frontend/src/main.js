@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { Quasar, Notify, Dialog } from 'quasar'
+import HighchartsVue from 'highcharts-vue'
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css'
@@ -17,6 +18,7 @@ const myApp = createApp(App)
 
 myApp.use(createPinia())
 myApp.use(router)
+myApp.use(HighchartsVue)
 myApp.use(Quasar, {
   plugins: {
     Notify,
