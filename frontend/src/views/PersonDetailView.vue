@@ -14,7 +14,7 @@
     <NavigationDrawer v-model="leftDrawerOpen" />
 
     <q-page-container>
-      <q-page class="q-pa-md">
+      <q-page class="q-pa-md" style="background-color: #f8f9fa;">
         <!-- Loading State -->
         <div v-if="peopleStore.isLoading" class="text-center q-pa-xl">
           <q-spinner-dots size="50px" color="primary" />
@@ -50,157 +50,190 @@
         </div>
 
         <!-- Person Details -->
-        <div v-else>
-          <!-- Header Section -->
-          <div class="row q-mb-lg">
-            <div class="col">
-              <div class="text-h4 q-mb-xs">{{ person.name }}</div>
-              <div v-if="person.name_ext" class="text-h6 text-grey-7 q-mb-sm">
-                {{ person.name_ext }}
-              </div>
-              <div class="text-caption text-grey-6">
-                Added {{ formatDate(person.created_at) }}
-                <span v-if="person.created_by_username">
-                  by {{ person.created_by_username }}
-                </span>
-              </div>
-            </div>
-            <div class="col-auto">
-              <q-btn-group>
-                <q-btn 
-                  color="primary" 
-                  icon="edit" 
-                  label="Edit"
-                  @click="editPerson"
-                />
-                <q-btn 
-                  color="negative" 
-                  icon="delete" 
-                  label="Delete"
-                  @click="showDeleteDialog = true"
-                />
-              </q-btn-group>
-            </div>
+        <div v-else class="person-detail-container">
+          <!-- Breadcrumb Navigation -->
+          <div class="breadcrumb-nav q-mb-md">
+            <q-breadcrumbs class="text-grey-6">
+              <q-breadcrumbs-el icon="people" label="People" @click="goBack" class="cursor-pointer" />
+              <q-breadcrumbs-el :label="person.name" />
+            </q-breadcrumbs>
           </div>
 
+          <!-- Header Section -->
+          <q-card class="header-card q-mb-lg" flat>
+            <q-card-section class="q-pa-lg">
+              <div class="row items-start q-gutter-md">
+                <div class="col">
+                  <div class="text-h4 q-mb-sm text-weight-medium">{{ person.name }}</div>
+                  <div v-if="person.name_ext" class="text-h6 text-grey-7 q-mb-md">
+                    {{ person.name_ext }}
+                  </div>
+                  <div class="text-body2 text-grey-6">
+                    <q-icon name="schedule" size="16px" class="q-mr-xs" />
+                    Added {{ formatDate(person.created_at) }}
+                    <span v-if="person.created_by_username">
+                      by {{ person.created_by_username }}
+                    </span>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="action-buttons">
+                    <q-btn 
+                      outline
+                      color="primary" 
+                      icon="edit" 
+                      label="Edit"
+                      class="q-mr-sm"
+                      @click="editPerson"
+                    />
+                    <q-btn 
+                      outline
+                      color="negative" 
+                      icon="delete" 
+                      label="Delete"
+                      @click="showDeleteDialog = true"
+                    />
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+
           <!-- Main Content -->
-          <div class="row q-gutter-lg">
-            <!-- Left Column - Basic Info -->
+          <div class="row q-col-gutter-lg">
+            <!-- Left Column - Contact Info -->
             <div class="col-12 col-md-6">
-              <q-card class="q-mb-md">
-                <q-card-section>
-                  <div class="text-h6 q-mb-md">Contact Information</div>
+              <q-card class="content-card q-mb-lg" flat bordered>
+                <q-card-section class="q-pa-lg">
+                  <div class="text-h6 q-mb-md text-weight-medium">Contact Information</div>
+
+                  <div v-if="person.location" class="contact-item q-mb-md">
+                    <div class="row items-center q-gutter-sm">
+                      <q-icon name="place" size="20px" color="grey-7" />
+                      <div class="col text-body1">{{ person.location }}</div>
+                    </div>
+                  </div>
                   
-                  <div v-if="person.email" class="q-mb-sm">
-                    <div class="text-body1">
-                      <q-icon name="email" size="16px" class="q-mr-xs" />
-                      {{ person.email }}
+                  <div v-if="person.email" class="contact-item q-mb-md">
+                    <div class="row items-center q-gutter-sm">
+                      <q-icon name="email" size="20px" color="grey-7" />
+                      <div class="col text-body1">{{ person.email }}</div>
                       <q-btn 
                         flat 
                         dense 
                         round 
                         size="sm" 
                         icon="content_copy" 
+                        color="grey-6"
                         @click="copyEmail"
-                        class="q-ml-xs"
                       >
                         <q-tooltip>Copy Email</q-tooltip>
                       </q-btn>
                     </div>
                   </div>
 
-                  <div v-if="person.phone" class="q-mb-sm">
-                    <div class="text-body1">
-                      <q-icon name="phone" size="16px" class="q-mr-xs" />
-                      {{ person.phone }}
+                  <div v-if="person.phone" class="contact-item q-mb-md">
+                    <div class="row items-center q-gutter-sm">
+                      <q-icon name="phone" size="20px" color="grey-7" />
+                      <div class="col text-body1">{{ person.phone }}</div>
                       <q-btn 
                         flat 
                         dense 
                         round 
                         size="sm" 
                         icon="sms" 
+                        color="grey-6"
                         @click="textPerson"
-                        class="q-ml-xs"
                       >
                         <q-tooltip>Send Text</q-tooltip>
                       </q-btn>
                     </div>
                   </div>
 
-                  <div v-if="person.location" class="q-mb-sm">
-                    <div class="text-body1">
-                      <q-icon name="place" size="16px" class="q-mr-xs" />
-                      {{ person.location }}
+                  <div v-if="person.birthday" class="contact-item q-mb-md">
+                    <div class="row items-center q-gutter-sm">
+                      <q-icon name="cake" size="20px" color="grey-7" />
+                      <div class="col">
+                        <div class="text-body1">{{ formatBirthday(person.birthday) }}</div>
+                        <div class="text-caption text-grey-6">Birthday</div>
+                      </div>
                     </div>
                   </div>
 
-                  <div v-if="person.birthday" class="q-mb-sm">
-                    <div class="text-caption text-grey-7">Birthday</div>
-                    <div class="text-body1">
-                      <q-icon name="cake" size="16px" class="q-mr-xs" />
-                      {{ formatBirthday(person.birthday) }}
-                    </div>
-                  </div>
-
-                  <div v-if="person.last_contacted" class="q-mb-sm">
-                    <div class="text-caption text-grey-7">Last Contact</div>
-                    <div class="text-body1 text-positive">
-                      <q-icon name="schedule" size="16px" class="q-mr-xs" />
-                      {{ formatDate(person.last_contacted) }}
+                  <div v-if="person.last_contacted" class="contact-item q-mb-md">
+                    <div class="row items-center q-gutter-sm">
+                      <q-icon name="schedule" size="20px" color="positive" />
+                      <div class="col">
+                        <div class="text-body1 text-positive">{{ formatDate(person.last_contacted) }}</div>
+                        <div class="text-caption text-grey-6">Last Contact</div>
+                      </div>
                     </div>
                   </div>
                 </q-card-section>
               </q-card>
 
               <!-- How We Met -->
-              <q-card v-if="person.how_we_met" class="q-mb-md">
-                <q-card-section>
-                  <div class="text-h6 q-mb-md">How We Met</div>
-                  <div class="text-body1">{{ person.how_we_met }}</div>
+              <q-card v-if="person.how_we_met" class="content-card" flat bordered>
+                <q-card-section class="q-pa-lg">
+                  <div class="text-h6 q-mb-md text-weight-medium">How We Met</div>
+                  <div class="text-body1 text-grey-8">{{ person.how_we_met }}</div>
                 </q-card-section>
               </q-card>
             </div>
 
             <!-- Right Column - Notes & AI Summary -->
             <div class="col-12 col-md-6">
-              <q-card v-if="person.notes" class="q-mb-md">
-                <q-card-section>
-                  <div class="text-h6 q-mb-md">Notes</div>
-                  <div class="text-body1 pre-line">{{ person.notes }}</div>
+              <q-card v-if="person.notes" class="content-card q-mb-lg" flat bordered>
+                <q-card-section class="q-pa-lg">
+                  <div class="text-h6 q-mb-md text-weight-medium">Notes</div>
+                  <div class="text-body1 text-grey-8 pre-line">{{ person.notes }}</div>
                 </q-card-section>
               </q-card>
 
-              <q-card v-if="person.ai_summary" class="q-mb-md">
-                <q-card-section>
-                  <div class="text-h6 q-mb-md">AI Summary</div>
-                  <div class="text-body1 pre-line">{{ person.ai_summary }}</div>
+              <q-card v-if="person.ai_summary" class="content-card q-mb-lg" flat bordered>
+                <q-card-section class="q-pa-lg">
+                  <div class="text-h6 q-mb-md text-weight-medium">AI Summary</div>
+                  <div class="text-body1 text-grey-8 pre-line">{{ person.ai_summary }}</div>
                 </q-card-section>
               </q-card>
 
               <!-- Quick Actions -->
-              <q-card class="q-mb-md">
-                <q-card-section>
-                  <div class="text-h6 q-mb-md">Quick Actions</div>
-                  <div class="row q-gutter-sm">
+              <q-card class="content-card" flat bordered>
+                <q-card-section class="q-pa-lg">
+                  <div class="text-h6 q-mb-md text-weight-medium">Quick Actions</div>
+                  
+                  <!-- Communication Actions -->
+                  <div v-if="person.email || person.phone" class="q-mb-md">
+                    <div class="text-subtitle2 text-grey-7 q-mb-sm">Communication</div>
+                    <div class="row q-gutter-sm">
+                      <q-btn 
+                        v-if="person.email"
+                        outline
+                        color="info" 
+                        icon="email" 
+                        label="Copy Email"
+                        @click="copyEmail"
+                      />
+                      <q-btn 
+                        v-if="person.phone"
+                        outline
+                        color="positive" 
+                        icon="sms" 
+                        label="Send Text"
+                        @click="textPerson"
+                      />
+                    </div>
+                  </div>
+                  
+                  <!-- Data Actions -->
+                  <div>
+                    <div class="text-subtitle2 text-grey-7 q-mb-sm">Record Activity</div>
                     <q-btn 
+                      outline
                       color="primary" 
                       icon="chat_bubble" 
                       label="Log Conversation"
                       @click="addConversation"
-                    />
-                    <q-btn 
-                      v-if="person.email"
-                      color="info" 
-                      icon="email" 
-                      label="Copy Email"
-                      @click="copyEmail"
-                    />
-                    <q-btn 
-                      v-if="person.phone"
-                      color="positive" 
-                      icon="sms" 
-                      label="Send Text"
-                      @click="textPerson"
                     />
                   </div>
                 </q-card-section>
@@ -394,5 +427,53 @@ onMounted(() => {
 <style scoped>
 .pre-line {
   white-space: pre-line;
+}
+
+.person-detail-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.breadcrumb-nav .q-breadcrumbs-el--link {
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.breadcrumb-nav .q-breadcrumbs-el--link:hover {
+  opacity: 1;
+}
+
+.header-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.content-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.content-card:hover {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+.contact-item {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.contact-item:last-child {
+  border-bottom: none;
+}
+
+.action-buttons .q-btn {
+  min-width: 120px;
+}
+
+.contact-item .q-icon {
+  min-width: 24px;
 }
 </style>
