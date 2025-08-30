@@ -70,6 +70,13 @@
                 <div class="col-auto">
                   <div class="action-buttons">
                     <q-btn 
+                      color="primary" 
+                      icon="chat_bubble" 
+                      label="Log Conversation"
+                      class="q-mr-sm"
+                      @click="addConversation"
+                    />
+                    <q-btn 
                       outline
                       color="primary" 
                       icon="edit" 
@@ -110,13 +117,13 @@
                       <q-icon name="email" size="20px" color="grey-7" />
                       <div class="col text-body1">{{ person.email }}</div>
                       <q-btn 
-                        flat 
-                        dense 
-                        round 
+                        unelevated
                         size="sm" 
                         icon="content_copy" 
-                        color="grey-6"
+                        color="info"
+                        text-color="white"
                         @click="copyEmail"
+                        class="contact-action-btn"
                       >
                         <q-tooltip>Copy Email</q-tooltip>
                       </q-btn>
@@ -128,13 +135,13 @@
                       <q-icon name="phone" size="20px" color="grey-7" />
                       <div class="col text-body1">{{ person.phone }}</div>
                       <q-btn 
-                        flat 
-                        dense 
-                        round 
+                        unelevated
                         size="sm" 
                         icon="sms" 
-                        color="grey-6"
+                        color="positive"
+                        text-color="white"
                         @click="textPerson"
+                        class="contact-action-btn"
                       >
                         <q-tooltip>Send Text</q-tooltip>
                       </q-btn>
@@ -160,20 +167,21 @@
                       </div>
                     </div>
                   </div>
+
+                  <!-- How We Met - De-emphasized -->
+                  <div v-if="person.how_we_met" class="contact-item">
+                    <div class="row items-start q-gutter-sm">
+                      <q-icon name="handshake" size="18px" color="grey-6" />
+                      <div class="col">
+                        <div class="text-body2 text-grey-7">{{ person.how_we_met }}</div>
+                        <div class="text-caption text-grey-5">How we met</div>
+                      </div>
+                    </div>
+                  </div>
                 </q-card-section>
               </q-card>
 
-              <!-- How We Met -->
-              <q-card v-if="person.how_we_met" class="content-card" flat bordered>
-                <q-card-section class="q-pa-lg">
-                  <div class="text-h6 q-mb-md text-weight-medium">How We Met</div>
-                  <div class="text-body1 text-grey-8">{{ person.how_we_met }}</div>
-                </q-card-section>
-              </q-card>
-            </div>
-
-            <!-- Right Column - Notes & AI Summary -->
-            <div class="col-12 col-md-6">
+              <!-- Notes -->
               <q-card v-if="person.notes" class="content-card q-mb-lg" flat bordered>
                 <q-card-section class="q-pa-lg">
                   <div class="text-h6 q-mb-md text-weight-medium">Notes</div>
@@ -181,59 +189,21 @@
                 </q-card-section>
               </q-card>
 
-              <q-card v-if="person.ai_summary" class="content-card q-mb-lg" flat bordered>
+              <!-- AI Summary -->
+              <q-card v-if="person.ai_summary" class="content-card" flat bordered>
                 <q-card-section class="q-pa-lg">
                   <div class="text-h6 q-mb-md text-weight-medium">AI Summary</div>
-                  <div class="text-body1 text-grey-8 pre-line">{{ person.ai_summary }}</div>
+                  <div class="text-body1 text-grey-8 pre-line ai-summary-text">{{ person.ai_summary }}</div>
                 </q-card-section>
               </q-card>
+            </div>
 
-              <!-- Quick Actions -->
+            <!-- Right Column - Conversations -->
+            <div class="col-12 col-md-6">
+              <!-- Conversations -->
               <q-card class="content-card q-mb-lg" flat bordered>
                 <q-card-section class="q-pa-lg">
-                  <div class="text-h6 q-mb-md text-weight-medium">Quick Actions</div>
-                  
-                  <!-- Communication Actions -->
-                  <div v-if="person.email || person.phone" class="q-mb-md">
-                    <div class="text-subtitle2 text-grey-7 q-mb-sm">Communication</div>
-                    <div class="row q-gutter-sm">
-                      <q-btn 
-                        v-if="person.email"
-                        outline
-                        color="info" 
-                        icon="email" 
-                        label="Copy Email"
-                        @click="copyEmail"
-                      />
-                      <q-btn 
-                        v-if="person.phone"
-                        outline
-                        color="positive" 
-                        icon="sms" 
-                        label="Send Text"
-                        @click="textPerson"
-                      />
-                    </div>
-                  </div>
-                  
-                  <!-- Data Actions -->
-                  <div>
-                    <div class="text-subtitle2 text-grey-7 q-mb-sm">Record Activity</div>
-                    <q-btn 
-                      outline
-                      color="primary" 
-                      icon="chat_bubble" 
-                      label="Log Conversation"
-                      @click="addConversation"
-                    />
-                  </div>
-                </q-card-section>
-              </q-card>
-
-              <!-- Recent Conversations -->
-              <q-card class="content-card q-mb-lg" flat bordered>
-                <q-card-section class="q-pa-lg">
-                  <div class="text-h6 q-mb-md text-weight-medium">Recent Conversations</div>
+                  <div class="text-h6 q-mb-md text-weight-medium">Conversations</div>
                   
                   <!-- Loading State -->
                   <div v-if="loadingConversations" class="text-center q-pa-md">
@@ -248,9 +218,9 @@
                   </div>
                   
                   <!-- Conversations List -->
-                  <div v-else>
+                  <div v-else class="conversations-scroll-container">
                     <div 
-                      v-for="conversation in personConversations.slice(0, 5)" 
+                      v-for="conversation in personConversations" 
                       :key="conversation.id"
                       class="conversation-timeline-item q-mb-sm cursor-pointer"
                       @click="viewConversation(conversation)"
@@ -273,16 +243,6 @@
                         </div>
                         <q-icon name="chevron_right" color="grey-4" size="16px" />
                       </div>
-                    </div>
-                    
-                    <div v-if="personConversations.length > 5" class="text-center q-mt-md">
-                      <q-btn 
-                        flat 
-                        color="primary" 
-                        label="View All Conversations"
-                        size="sm"
-                        @click="viewAllConversations"
-                      />
                     </div>
                   </div>
                 </q-card-section>
@@ -527,13 +487,6 @@ const viewConversation = (conversation) => {
   router.push({ name: 'conversation-detail', params: { id: conversation.id } })
 }
 
-const viewAllConversations = () => {
-  router.push({ 
-    name: 'conversations', 
-    query: { participant: person.value.id } 
-  })
-}
-
 
 // Watch for route parameter changes
 watch(() => route.params.id, (newId, oldId) => {
@@ -613,5 +566,39 @@ onMounted(() => {
 
 .conversation-preview {
   line-height: 1.4;
+}
+
+.contact-action-btn {
+  min-width: 36px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.conversations-scroll-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.conversations-scroll-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.conversations-scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
+}
+
+.conversations-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.conversations-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.ai-summary-text {
+  font-style: italic;
 }
 </style>
