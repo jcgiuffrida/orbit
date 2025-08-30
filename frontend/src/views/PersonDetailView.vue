@@ -230,6 +230,64 @@
                 </q-card-section>
               </q-card>
 
+              <!-- Recent Conversations -->
+              <q-card class="content-card q-mb-lg" flat bordered>
+                <q-card-section class="q-pa-lg">
+                  <div class="text-h6 q-mb-md text-weight-medium">Recent Conversations</div>
+                  
+                  <!-- Loading State -->
+                  <div v-if="loadingConversations" class="text-center q-pa-md">
+                    <q-spinner-dots size="20px" color="primary" />
+                    <div class="text-caption text-grey-6 q-mt-sm">Loading conversations...</div>
+                  </div>
+                  
+                  <!-- No conversations -->
+                  <div v-else-if="personConversations.length === 0" class="text-center q-pa-md">
+                    <q-icon name="chat_bubble_outline" size="32px" color="grey-4" />
+                    <div class="text-body2 text-grey-6 q-mt-sm">No conversations recorded yet</div>
+                  </div>
+                  
+                  <!-- Conversations List -->
+                  <div v-else>
+                    <div 
+                      v-for="conversation in personConversations.slice(0, 5)" 
+                      :key="conversation.id"
+                      class="conversation-timeline-item q-mb-sm cursor-pointer"
+                      @click="viewConversation(conversation)"
+                    >
+                      <div class="row items-start q-gutter-sm">
+                        <q-avatar size="32px" :color="getConversationTypeColor(conversation.type)" text-color="white">
+                          <q-icon :name="getConversationTypeIcon(conversation.type)" size="16px" />
+                        </q-avatar>
+                        <div class="col">
+                          <div class="text-body2 text-weight-medium q-mb-xs">
+                            {{ getConversationTypeLabel(conversation.type) }}
+                            <span v-if="conversation.location"> • {{ conversation.location }}</span>
+                          </div>
+                          <div class="text-caption text-grey-6 q-mb-xs">
+                            {{ formatConversationDate(conversation.date) }}
+                          </div>
+                          <div class="text-body2 text-grey-7 conversation-preview">
+                            {{ truncateText(conversation.notes, 100) }}
+                          </div>
+                        </div>
+                        <q-icon name="chevron_right" color="grey-4" size="16px" />
+                      </div>
+                    </div>
+                    
+                    <div v-if="personConversations.length > 5" class="text-center q-mt-md">
+                      <q-btn 
+                        flat 
+                        color="primary" 
+                        label="View All Conversations"
+                        size="sm"
+                        @click="viewAllConversations"
+                      />
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+
               <!-- Relationships -->
               <PersonRelationships 
                 :key="person.id"
@@ -266,6 +324,8 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { usePeopleStore } from '@/stores/people'
+import { useConversationsStore } from '@/stores/conversations'
+import { getConversationTypeIcon, getConversationTypeLabel } from '@/services/conversations'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import PersonRelationships from '@/components/PersonRelationships.vue'
@@ -274,9 +334,12 @@ const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
 const peopleStore = usePeopleStore()
+const conversationsStore = useConversationsStore()
 
 const leftDrawerOpen = ref(false)
 const showDeleteDialog = ref(false)
+const loadingConversations = ref(false)
+const personConversations = ref([])
 
 // Get person from store
 const person = computed(() => peopleStore.selectedPerson)
@@ -287,9 +350,26 @@ const loadPerson = async () => {
   if (personId) {
     try {
       await peopleStore.fetchPersonById(personId)
+      // Also load conversations for this person
+      await loadConversations()
     } catch (error) {
       console.error('Failed to load person:', error)
     }
+  }
+}
+
+const loadConversations = async () => {
+  if (!person.value) return
+  
+  loadingConversations.value = true
+  try {
+    const conversations = await conversationsStore.fetchConversationsForPerson(person.value.id)
+    personConversations.value = conversations
+  } catch (error) {
+    console.error('Failed to load conversations:', error)
+    personConversations.value = []
+  } finally {
+    loadingConversations.value = false
   }
 }
 
@@ -368,8 +448,12 @@ const textPerson = () => {
 }
 
 const addConversation = () => {
-  // TODO: Navigate to add conversation with person pre-selected
-  console.log('Add conversation with:', person.value)
+  if (person.value) {
+    router.push({ 
+      name: 'conversation-create', 
+      query: { participants: person.value.id } 
+    })
+  }
 }
 
 const formatDate = (dateString) => {
@@ -402,6 +486,51 @@ const formatBirthday = (dateString) => {
     month: 'long', 
     day: 'numeric',
     year: 'numeric'
+  })
+}
+
+const formatConversationDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = now - date
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 0) return 'Today'
+  if (diffDays === 1) return 'Yesterday'
+  if (diffDays < 7) return `${diffDays} days ago`
+  return date.toLocaleDateString(undefined, { 
+    weekday: 'short',
+    month: 'short', 
+    day: 'numeric'
+  })
+}
+
+const truncateText = (text, maxLength) => {
+  if (!text || text.length <= maxLength) return text
+  return text.substring(0, maxLength).trim() + '...'
+}
+
+const getConversationTypeColor = (type) => {
+  const colors = {
+    'in_person': 'primary',
+    'phone': 'positive',
+    'text': 'info',
+    'email': 'secondary',
+    'video': 'accent',
+    'other': 'grey-6'
+  }
+  return colors[type] || 'grey-6'
+}
+
+const viewConversation = (conversation) => {
+  router.push({ name: 'conversation-detail', params: { id: conversation.id } })
+}
+
+const viewAllConversations = () => {
+  router.push({ 
+    name: 'conversations', 
+    query: { participant: person.value.id } 
   })
 }
 
@@ -470,5 +599,19 @@ onMounted(() => {
 
 .contact-item .q-icon {
   min-width: 24px;
+}
+
+.conversation-timeline-item {
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.conversation-timeline-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.conversation-preview {
+  line-height: 1.4;
 }
 </style>

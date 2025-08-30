@@ -17,23 +17,22 @@ class PersonSerializer(serializers.ModelSerializer):
 
 
 class ConversationSerializer(serializers.ModelSerializer):
-    participants = serializers.PrimaryKeyRelatedField(
-        many=True, 
-        queryset=Person.objects.all()
+    participants = PersonSerializer(many=True, read_only=True)
+    participant_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Person.objects.all(),
+        source='participants',
+        write_only=True
     )
-    participant_names = serializers.SerializerMethodField()
     created_by_username = serializers.ReadOnlyField(source='created_by.username')
 
     class Meta:
         model = Conversation
         fields = [
-            'id', 'participants', 'participant_names', 'date', 'type', 
+            'id', 'participants', 'participant_ids', 'date', 'type', 
             'location', 'notes', 'private', 'created_by_username', 'created_at'
         ]
-        read_only_fields = ['created_at', 'participant_names', 'created_by_username']
-
-    def get_participant_names(self, obj):
-        return [participant.name for participant in obj.participants.all()]
+        read_only_fields = ['created_at', 'participants', 'created_by_username']
 
 
 class ContactAttemptSerializer(serializers.ModelSerializer):

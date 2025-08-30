@@ -40,6 +40,24 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/conversations/new',
+      name: 'conversation-create',
+      component: () => import('@/views/ConversationCreateView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/conversations/:id',
+      name: 'conversation-detail',
+      component: () => import('@/views/ConversationDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/conversations/:id/edit',
+      name: 'conversation-edit',
+      component: () => import('@/views/ConversationCreateView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/contact-attempts',
       name: 'contact-attempts',
       component: () => import('@/views/ContactAttemptsView.vue'),
