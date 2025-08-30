@@ -1,13 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn flat round dense icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
-        <q-toolbar-title>People</q-toolbar-title>
-        <q-space />
-        <q-btn flat round dense icon="logout" @click="handleLogout" />
-      </q-toolbar>
-    </q-header>
+    <AppHeader @toggle-drawer="leftDrawerOpen = !leftDrawerOpen" />
 
     <NavigationDrawer v-model="leftDrawerOpen" />
 
@@ -144,13 +137,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { useAuthStore } from '@/stores/auth'
 import { usePeopleStore } from '@/stores/people'
+import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
 const router = useRouter()
 const $q = useQuasar()
-const authStore = useAuthStore()
 const peopleStore = usePeopleStore()
 
 const leftDrawerOpen = ref(false)
@@ -301,16 +293,6 @@ const addConversation = (person) => {
   console.log('Add conversation with:', person)
 }
 
-const handleLogout = async () => {
-  await authStore.logout()
-  $q.notify({
-    type: 'info',
-    message: '👋 Logged out successfully',
-    position: 'top',
-    timeout: 2000
-  })
-  router.push({ name: 'login' })
-}
 
 // Lifecycle
 onMounted(() => {
