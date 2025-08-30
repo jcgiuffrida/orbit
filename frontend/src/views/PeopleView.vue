@@ -12,7 +12,7 @@
     <NavigationDrawer v-model="leftDrawerOpen" />
 
     <q-page-container>
-      <q-page class="q-pa-md">
+      <q-page class="q-pa-md" style="background-color: #f8f9fa;">
         <!-- Header -->
         <div class="row items-center q-mb-lg">
           <div class="text-h4 col">People</div>
