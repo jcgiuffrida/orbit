@@ -103,11 +103,11 @@ USE_I18N = False
 
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
 STATICFILES_DIRS = [
-    str(BASE_DIR / "frontend" / "dist" / "static"),
+    str(BASE_DIR / "frontend" / "dist" ),
 ]
 
 # The following is necessary when using django-vite with whitenoise

@@ -30,9 +30,10 @@ export default defineConfig({
       },
     }
   },
+  base: '/static/',
   build: {
     outDir: 'dist',
-    assetsDir: 'static/assets',
+    assetsDir: 'assets',
     manifest: true,
     rollupOptions: {
       input: {
