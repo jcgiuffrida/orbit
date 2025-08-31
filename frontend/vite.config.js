@@ -30,8 +30,8 @@ export default defineConfig({
       },
     }
   },
+  base: '/static/',
   build: {
-    base: '/static/',
     outDir: 'dist',
     assetsDir: 'assets',
     manifest: true,
