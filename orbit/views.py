@@ -230,26 +230,34 @@ def dashboard_analytics(request):
     
     # Monthly activity data for chart (past 12 months)
     monthly_data = []
+    current_date = today.replace(day=1)  # Start of current month
+    
     for month in range(12):
+        # Calculate the target month (going backwards)
+        if month == 0:
+            target_month = current_date
+        else:
+            # Go back month by month
+            year = current_date.year
+            month_num = current_date.month - month
+            while month_num <= 0:
+                month_num += 12
+                year -= 1
+            target_month = current_date.replace(year=year, month=month_num, day=1)
+        
         # Calculate month boundaries
-        if month == 0:
-            month_end = today
-        else:
-            month_end = (today.replace(day=1) - timedelta(days=1)).replace(day=1) if month == 1 else (today.replace(day=1) - timedelta(days=32*month)).replace(day=1) - timedelta(days=1)
+        month_start = target_month
         
-        if month == 0:
-            month_start = today.replace(day=1)
+        # Get the last day of this month
+        if target_month.month == 12:
+            next_month_start = target_month.replace(year=target_month.year + 1, month=1, day=1)
         else:
-            temp_date = today.replace(day=1) - timedelta(days=32*month)
-            month_start = temp_date.replace(day=1)
+            next_month_start = target_month.replace(month=target_month.month + 1, day=1)
+        month_end = next_month_start - timedelta(days=1)
         
-        # Adjust end date for current month
+        # For current month, don't go beyond today
         if month == 0:
-            month_end = today
-        else:
-            # Get last day of the month
-            next_month = month_start.replace(day=28) + timedelta(days=4)
-            month_end = next_month - timedelta(days=next_month.day)
+            month_end = min(month_end, today)
         
         conv_count = Conversation.objects.filter(
             Q(date__gte=month_start) & Q(date__lte=month_end) &
@@ -269,7 +277,7 @@ def dashboard_analytics(request):
             'contact_attempts': attempt_count
         })
     
-    monthly_data.reverse()  # Show chronologically
+    monthly_data.reverse()  # Show chronologically (oldest first)
     
     return Response({
         'recent_conversations': ConversationSerializer(recent_conversations, many=True).data,
