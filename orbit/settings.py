@@ -107,7 +107,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
 STATICFILES_DIRS = [
-    str(BASE_DIR / "frontend" / "dist"),
+    str(BASE_DIR / "frontend" / "dist" / "static"),
 ]
 
 # The following is necessary when using django-vite with whitenoise
