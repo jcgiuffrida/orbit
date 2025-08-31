@@ -32,7 +32,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    assetsDir: 'assets',
+    assetsDir: 'static/assets',
     manifest: true,
     rollupOptions: {
       input: {
