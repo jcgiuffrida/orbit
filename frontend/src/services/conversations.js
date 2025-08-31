@@ -7,8 +7,16 @@ export const conversationsService = {
   },
 
   async fetchConversationsForPerson(personId) {
+    if (!personId) {
+      console.warn('fetchConversationsForPerson called with empty personId')
+      return []
+    }
+    
     const response = await api.get(`/conversations/?participant=${personId}`)
-    return response.data.results
+    const results = response.data.results || response.data || []
+    
+    console.log(`Fetched ${results.length} conversations for person ${personId}`)
+    return results
   },
 
   async fetchConversationById(id) {

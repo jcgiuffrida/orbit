@@ -36,9 +36,24 @@ class ConversationViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         # Include public conversations (private=False) and private conversations created by current user
-        return Conversation.objects.filter(
+        queryset = Conversation.objects.filter(
             Q(private=False) | Q(private=True, created_by=self.request.user)
-        ).order_by('-date')
+        )
+        
+        # Filter by participant if provided
+        participant_id = self.request.query_params.get('participant', None)
+        if participant_id:
+            print(f"Filtering conversations for participant: {participant_id}")
+            try:
+                queryset = queryset.filter(participants__id=participant_id)
+                count = queryset.count()
+                print(f"Found {count} conversations for participant {participant_id}")
+            except (ValueError, TypeError) as e:
+                print(f"Error filtering by participant {participant_id}: {e}")
+                # Return empty queryset if participant_id is invalid
+                return Conversation.objects.none()
+        
+        return queryset.order_by('-date')
     
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)

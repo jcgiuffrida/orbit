@@ -329,9 +329,11 @@ const loadConversations = async () => {
   if (!person.value) return
   
   loadingConversations.value = true
+  personConversations.value = [] // Clear previous conversations immediately
+  
   try {
     const conversations = await conversationsStore.fetchConversationsForPerson(person.value.id)
-    personConversations.value = conversations
+    personConversations.value = conversations || []
   } catch (error) {
     console.error('Failed to load conversations:', error)
     personConversations.value = []
@@ -544,6 +546,7 @@ const getLastContactTextClass = (dateString) => {
 // Watch for route parameter changes
 watch(() => route.params.id, (newId, oldId) => {
   if (newId && newId !== oldId) {
+    personConversations.value = [] // Clear conversations immediately when person changes
     loadPerson()
   }
 })

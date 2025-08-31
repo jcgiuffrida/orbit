@@ -184,6 +184,7 @@ import { ref, onMounted, computed, reactive, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import relationshipsService from '@/services/relationships'
 import { usePeopleStore } from '@/stores/people'
+import { useRelationshipsStore } from '@/stores/relationships'
 
 const props = defineProps({
   personId: {
@@ -198,10 +199,11 @@ const props = defineProps({
 
 const $q = useQuasar()
 const peopleStore = usePeopleStore()
+const relationshipsStore = useRelationshipsStore()
 
 // State
-const relationships = ref([])
-const loading = ref(false)
+const relationships = computed(() => relationshipsStore.getRelationshipsForPerson(props.personId))
+const loading = computed(() => relationshipsStore.isLoading)
 const saving = ref(false)
 const showAddDialog = ref(false)
 const showDeleteDialog = ref(false)
@@ -220,10 +222,9 @@ const form = reactive({
 const relationshipTypeOptions = computed(() => relationshipsService.getRelationshipTypes())
 
 // Methods
-const loadRelationships = async () => {
-  loading.value = true
+const loadRelationships = async (forceRefresh = false) => {
   try {
-    relationships.value = await relationshipsService.getByPerson(props.personId)
+    await relationshipsStore.fetchAllRelationships(forceRefresh)
   } catch (error) {
     console.error('Error loading relationships:', error)
     $q.notify({
@@ -232,8 +233,6 @@ const loadRelationships = async () => {
       position: 'top',
       timeout: 3000
     })
-  } finally {
-    loading.value = false
   }
 }
 
@@ -329,7 +328,7 @@ const saveRelationship = async () => {
     }
 
     if (editingRelationship.value) {
-      await relationshipsService.update(editingRelationship.value.id, relationshipData)
+      await relationshipsStore.updateRelationship(editingRelationship.value.id, relationshipData)
       $q.notify({
         type: 'positive',
         message: 'Relationship updated successfully',
@@ -337,7 +336,7 @@ const saveRelationship = async () => {
         timeout: 3000
       })
     } else {
-      await relationshipsService.create(relationshipData)
+      await relationshipsStore.createRelationship(relationshipData)
       $q.notify({
         type: 'positive',
         message: 'Relationship added successfully',
@@ -346,7 +345,6 @@ const saveRelationship = async () => {
       })
     }
 
-    await loadRelationships()
     cancelEdit()
   } catch (error) {
     console.error('Error saving relationship:', error)
@@ -365,7 +363,7 @@ const deleteRelationship = async () => {
   if (!relationshipToDelete.value) return
 
   try {
-    await relationshipsService.delete(relationshipToDelete.value.id)
+    await relationshipsStore.deleteRelationship(relationshipToDelete.value.id)
     $q.notify({
       type: 'positive',
       message: 'Relationship deleted successfully',
@@ -373,7 +371,6 @@ const deleteRelationship = async () => {
       timeout: 3000
     })
     
-    await loadRelationships()
     showDeleteDialog.value = false
     relationshipToDelete.value = null
   } catch (error) {
@@ -407,16 +404,21 @@ const cancelEdit = () => {
   form.description = ''
 }
 
-// Watch for personId changes and reload relationships
+// Watch for personId changes - no need to reload since computed relationships will update automatically
 watch(() => props.personId, (newPersonId, oldPersonId) => {
-  if (newPersonId && newPersonId !== oldPersonId) {
+  // The computed relationships will automatically update when personId changes
+  // Only need to ensure data is loaded if cache is invalid
+  if (newPersonId && newPersonId !== oldPersonId && !relationshipsStore.isCacheValid) {
     loadRelationships()
   }
 }, { immediate: false })
 
 // Lifecycle
 onMounted(() => {
-  loadRelationships()
+  // Only load if not cached
+  if (!relationshipsStore.isCacheValid || relationshipsStore.relationshipsCount === 0) {
+    loadRelationships()
+  }
   loadPeopleOptions()
 })
 </script>
