@@ -30,6 +30,7 @@ npm-debug.log*
 
 # Static files
 static/
+!frontend/dist/static/
 
 # Environment variables
 .env
