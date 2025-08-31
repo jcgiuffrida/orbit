@@ -9,5 +9,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('orbit.api_urls')),
     # Serve Vue.js frontend for all other routes
-    re_path(r'^.*$', index_view, name='frontend'),
+    re_path(r'^(?!admin|api).*$', index_view, name='frontend'),
 ]
