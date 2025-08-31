@@ -316,7 +316,7 @@ const deleteContactAttempt = async (attempt) => {
     try {
       await contactAttemptsStore.deleteContactAttempt(attempt.id)
       $q.notify({
-        type: 'negative',
+        type: 'positive',
         message: 'Contact attempt deleted successfully',
         position: 'top',
         timeout: 3000

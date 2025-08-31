@@ -356,7 +356,7 @@ const confirmDelete = async () => {
     showDeleteDialog.value = false
     
     $q.notify({
-      type: 'negative',
+      type: 'positive',
       message: `Conversation with ${participantNames} deleted successfully`,
       position: 'top',
       timeout: 4000,

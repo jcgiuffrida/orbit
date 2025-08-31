@@ -318,7 +318,7 @@ const deleteConversation = async (conversation) => {
     try {
       await conversationsStore.deleteConversation(conversation.id)
       $q.notify({
-        type: 'negative',
+        type: 'positive',
         message: 'Conversation deleted successfully',
         position: 'top',
         timeout: 3000
