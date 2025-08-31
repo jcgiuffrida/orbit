@@ -152,11 +152,11 @@
                     </div>
                   </div>
 
-                  <div class="detail-item">
+                  <div class="detail-item" v-if="conversation.private">
                     <div class="row items-center q-gutter-sm">
-                      <q-icon :name="conversation.private ? 'lock' : 'public'" size="20px" :color="conversation.private ? 'orange' : 'positive'" />
+                      <q-icon name="lock" size="20px" color="orange" />
                       <div class="col">
-                        <div class="text-body1">{{ conversation.private ? 'Private' : 'Shared' }}</div>
+                        <div class="text-body1">Private to you</div>
                       </div>
                     </div>
                   </div>
@@ -229,7 +229,8 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useConversationsStore } from '@/stores/conversations'
-import { getConversationTypeIcon, getConversationTypeLabel } from '@/services/conversations'
+import { getConversationTypeIcon, getConversationTypeLabel, getConversationTypeColor } from '@/services/conversations'
+import { formatDate, formatDateLong } from '@/utils/dateFormatting'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
@@ -250,67 +251,7 @@ const getParticipantNames = (participants) => {
 
 const getTypeIcon = (type) => getConversationTypeIcon(type)
 const getTypeLabel = (type) => getConversationTypeLabel(type)
-
-const getTypeColor = (type) => {
-  const colors = {
-    'in_person': 'primary',
-    'phone': 'positive',
-    'text': 'info',
-    'email': 'secondary',
-    'video': 'accent',
-    'other': 'grey-6'
-  }
-  return colors[type] || 'grey-6'
-}
-
-const formatDate = (dateString) => {
-  if (!dateString) return 'Never'
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = now - date
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 30) {
-    const weeks = Math.floor(diffDays / 7)
-    return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`
-  }
-  if (diffDays < 365) {
-    const months = Math.floor(diffDays / 30)
-    return months === 1 ? '1 month ago' : `${months} months ago`
-  }
-  return date.toLocaleDateString()
-}
-
-const formatDateLong = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = now - date
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) {
-    return `Today, ${date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}`
-  } else if (diffDays === 1) {
-    return `Yesterday, ${date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}`
-  } else if (diffDays < 7) {
-    return date.toLocaleDateString(undefined, { 
-      weekday: 'long',
-      month: 'long', 
-      day: 'numeric',
-      year: 'numeric'
-    })
-  } else {
-    return date.toLocaleDateString(undefined, { 
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long', 
-      day: 'numeric'
-    })
-  }
-}
+const getTypeColor = (type) => getConversationTypeColor(type)
 
 const loadConversation = async () => {
   const conversationId = route.params.id

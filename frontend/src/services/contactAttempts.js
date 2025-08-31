@@ -32,11 +32,11 @@ export const contactAttemptsService = {
 }
 
 export const contactAttemptTypes = [
-  { label: 'Text Message', value: 'text', icon: 'sms' },
-  { label: 'Email', value: 'email', icon: 'email' },
-  { label: 'Phone Call', value: 'call', icon: 'phone' },
-  { label: 'Social Media', value: 'social', icon: 'share' },
-  { label: 'Other', value: 'other', icon: 'contact_phone' }
+  { label: 'Text Message', value: 'text', icon: 'sms', color: 'info' },
+  { label: 'Email', value: 'email', icon: 'email', color: 'secondary' },
+  { label: 'Phone Call', value: 'call', icon: 'phone', color: 'positive' },
+  { label: 'Social Media', value: 'social', icon: 'share', color: 'accent' },
+  { label: 'Other', value: 'other', icon: 'contact_phone', color: 'grey-6' }
 ]
 
 export const getContactAttemptTypeIcon = (type) => {
@@ -47,4 +47,9 @@ export const getContactAttemptTypeIcon = (type) => {
 export const getContactAttemptTypeLabel = (type) => {
   const typeConfig = contactAttemptTypes.find(t => t.value === type)
   return typeConfig?.label || 'Other'
+}
+
+export const getContactAttemptTypeColor = (type) => {
+  const typeConfig = contactAttemptTypes.find(t => t.value === type)
+  return typeConfig?.color || 'grey-6'
 }

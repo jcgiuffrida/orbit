@@ -252,7 +252,11 @@
                             {{ formatConversationDate(conversation.date) }}
                           </div>
                           <div class="text-body2 text-grey-7 conversation-preview">
-                            {{ truncateText(conversation.notes, 100) }}
+                            {{ truncateText(conversation.notes, 150) }}
+                          </div>
+                          <div v-if="conversation.private" class="q-mt-sm text-warning">
+                            <q-icon name="lock" class="q-mb-xs" />
+                            Private to you
                           </div>
                         </div>
                         <q-icon name="chevron_right" color="grey-4" size="16px" />
@@ -292,7 +296,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { usePeopleStore } from '@/stores/people'
 import { useConversationsStore } from '@/stores/conversations'
-import { getConversationTypeIcon, getConversationTypeLabel } from '@/services/conversations'
+import { getConversationTypeIcon, getConversationTypeLabel, getConversationTypeColor } from '@/services/conversations'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import PersonRelationships from '@/components/PersonRelationships.vue'
@@ -500,17 +504,6 @@ const truncateText = (text, maxLength) => {
   return text.substring(0, maxLength).trim() + '...'
 }
 
-const getConversationTypeColor = (type) => {
-  const colors = {
-    'in_person': 'primary',
-    'phone': 'positive',
-    'text': 'info',
-    'email': 'secondary',
-    'video': 'accent',
-    'other': 'grey-6'
-  }
-  return colors[type] || 'grey-6'
-}
 
 const viewConversation = (conversation) => {
   router.push({ name: 'conversation-detail', params: { id: conversation.id } })

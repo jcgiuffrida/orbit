@@ -165,9 +165,10 @@ def dashboard_analytics(request):
     year_ago = today - timedelta(days=365)
     two_years_ago = today - timedelta(days=730)
     
-    # Recent conversations (last 10)
+    # Recent conversations (last 10, within past year)
     recent_conversations = Conversation.objects.filter(
-        Q(private=False) | Q(private=True, created_by=request.user)
+        Q(date__gte=year_ago) &
+        (Q(private=False) | Q(private=True, created_by=request.user))
     ).order_by('-date')[:10]
     
     # Top contacts by conversation count in past 1-2 years
@@ -227,9 +228,9 @@ def dashboard_analytics(request):
         recent_conversations=0       # But none in past month
     ).distinct()[:10]
     
-    # Monthly activity data for chart (past 6 months)
+    # Monthly activity data for chart (past 12 months)
     monthly_data = []
-    for month in range(6):
+    for month in range(12):
         # Calculate month boundaries
         if month == 0:
             month_end = today
@@ -252,12 +253,12 @@ def dashboard_analytics(request):
         
         conv_count = Conversation.objects.filter(
             Q(date__gte=month_start) & Q(date__lte=month_end) &
-            (Q(private=False) | Q(private=True, created_by=request.user))
+            (Q(private=False) | Q(created_by=request.user))
         ).count()
         
         attempt_count = ContactAttempt.objects.filter(
             Q(date__gte=month_start) & Q(date__lte=month_end) &
-            (Q(private=False) | Q(private=True, created_by=request.user))
+            (Q(private=False) | Q(created_by=request.user))
         ).count()
         
         monthly_data.append({

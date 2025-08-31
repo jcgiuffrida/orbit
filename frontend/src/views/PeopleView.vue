@@ -289,8 +289,10 @@ const addPerson = () => {
 }
 
 const addConversation = (person) => {
-  // TODO: Navigate to add conversation with person pre-selected
-  console.log('Add conversation with:', person)
+  router.push({ 
+    name: 'conversation-create', 
+    query: { participants: person.id } 
+  })
 }
 
 const getLastContactColor = (dateString) => {

@@ -72,16 +72,20 @@ const chartOptions = computed(() => {
       }
     },
     tooltip: {
+      shared: true,
       backgroundColor: '#ffffff',
       borderColor: '#e0e0e0',
       borderRadius: 8,
       shadow: true,
       useHTML: true,
       formatter: function() {
-        let tooltipText = `<div style="text-align: center; margin-bottom: 5px;"><b>${this.x}</b></div>`
-        this.points.forEach(point => {
-          tooltipText += `<div><span style="color:${point.color}">●</span> ${point.series.name}: <b>${point.y}</b></div>`
-        })
+        const monthName = this.points && this.points.length > 0 ? this.points[0].category : this.x
+        let tooltipText = `<div style="text-align: center; margin-bottom: 5px; font-weight: bold;">${monthName}</div>`
+        if (this.points) {
+          this.points.forEach(point => {
+            tooltipText += `<div style="margin: 2px 0;"><span style="color:${point.color}; font-size: 14px;">●</span> ${point.series.name}: <b>${point.y}</b></div>`
+          })
+        }
         return tooltipText
       }
     },
@@ -120,7 +124,7 @@ const chartOptions = computed(() => {
         }
       },
       {
-        name: 'Contact Attempts',
+        name: 'Pings',
         data: contactAttemptsData,
         color: '#424242',
         marker: {

@@ -172,7 +172,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useConversationsStore } from '@/stores/conversations'
-import { conversationTypes, getConversationTypeIcon, getConversationTypeLabel } from '@/services/conversations'
+import { conversationTypes, getConversationTypeIcon, getConversationTypeLabel, getConversationTypeColor } from '@/services/conversations'
+import { formatDate } from '@/utils/dateFormatting'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
@@ -242,38 +243,7 @@ const getParticipantNames = (participants) => {
 const getTypeIcon = (type) => getConversationTypeIcon(type)
 const getTypeLabel = (type) => getConversationTypeLabel(type)
 
-const getTypeColor = (type) => {
-  const colors = {
-    'in_person': 'primary',
-    'phone': 'positive',
-    'text': 'info',
-    'email': 'secondary',
-    'video': 'accent',
-    'other': 'grey-6'
-  }
-  return colors[type] || 'grey-6'
-}
-
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = now - date
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 30) {
-    const weeks = Math.floor(diffDays / 7)
-    return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`
-  }
-  if (diffDays < 365) {
-    const months = Math.floor(diffDays / 30)
-    return months === 1 ? '1 month ago' : `${months} months ago`
-  }
-  return date.toLocaleDateString()
-}
+const getTypeColor = (type) => getConversationTypeColor(type)
 
 const truncateText = (text, maxLength) => {
   if (!text || text.length <= maxLength) return text

@@ -119,6 +119,9 @@
                     </div>
                     <div class="text-body2 text-grey-8 q-mb-sm">
                       {{ formatDate(attempt.date) }}
+                      <q-tooltip>
+                        {{ formatDateLong(attempt.date) }}
+                      </q-tooltip>
                     </div>
                     <div v-if="attempt.notes" class="text-body2 text-grey-7">
                       {{ truncateText(attempt.notes, 150) }}
@@ -176,7 +179,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useContactAttemptsStore } from '@/stores/contactAttempts'
-import { contactAttemptTypes, getContactAttemptTypeIcon, getContactAttemptTypeLabel } from '@/services/contactAttempts'
+import { contactAttemptTypes, getContactAttemptTypeIcon, getContactAttemptTypeLabel, getContactAttemptTypeColor } from '@/services/contactAttempts'
+import { formatDate, formatDateLong } from '@/utils/dateFormatting'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 
@@ -238,37 +242,7 @@ const filteredContactAttempts = computed(() => {
 const getTypeIcon = (type) => getContactAttemptTypeIcon(type)
 const getTypeLabel = (type) => getContactAttemptTypeLabel(type)
 
-const getTypeColor = (type) => {
-  const colors = {
-    'text': 'info',
-    'email': 'secondary', 
-    'call': 'positive',
-    'social': 'accent',
-    'other': 'grey-6'
-  }
-  return colors[type] || 'grey-6'
-}
-
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = now - date
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 30) {
-    const weeks = Math.floor(diffDays / 7)
-    return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`
-  }
-  if (diffDays < 365) {
-    const months = Math.floor(diffDays / 30)
-    return months === 1 ? '1 month ago' : `${months} months ago`
-  }
-  return date.toLocaleDateString()
-}
+const getTypeColor = (type) => getContactAttemptTypeColor(type)
 
 const truncateText = (text, maxLength) => {
   if (!text || text.length <= maxLength) return text

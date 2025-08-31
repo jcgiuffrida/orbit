@@ -29,20 +29,26 @@
                   color="primary"
                   icon="add_comment" 
                   :to="{ name: 'conversation-create' }"
-                  label="New Conversation"
-                />
+                  :label="$q.screen.gt.xs ? 'New Conversation' : undefined"
+                >
+                  <q-tooltip v-if="!$q.screen.gt.xs">New Conversation</q-tooltip>
+                </q-btn>
                 <q-btn 
                   color="secondary"
                   icon="contact_phone" 
                   :to="{ name: 'contact-attempt-create' }"
-                  label="New Ping"
-                />
+                  :label="$q.screen.gt.xs ? 'New Ping' : undefined"
+                >
+                  <q-tooltip v-if="!$q.screen.gt.xs">New Ping</q-tooltip>
+                </q-btn>
                 <q-btn 
                   color="accent"
                   icon="person_add" 
-                  :to="{ name: 'person-create' }"
-                  label="Add Person"
-                />
+                  :to="{ name: 'person-edit', params: {id: 'new' } }"
+                  :label="$q.screen.gt.xs ? 'Add Person' : undefined"
+                >
+                  <q-tooltip v-if="!$q.screen.gt.xs">Add Person</q-tooltip>
+                </q-btn>
               </div>
             </div>
           </div>
@@ -52,10 +58,10 @@
             <div class="col-12">
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">Activity Over Past 6 Months</div>
+                  <div class="text-h6">Activity Over Past Year</div>
                 </q-card-section>
                 <q-card-section>
-                  <WeeklyActivityChart :data="dashboardData.monthly_activity" />
+                  <ActivityChart :data="dashboardData.monthly_activity" />
                 </q-card-section>
               </q-card>
             </div>
@@ -101,7 +107,7 @@
                 <q-card-section>
                   <q-list separator>
                     <q-item 
-                      v-for="conversation in dashboardData.recent_conversations.slice(0, 5)" 
+                      v-for="conversation in dashboardData.recent_conversations.slice(0, 8)" 
                       :key="conversation.id"
                       :to="{ name: 'conversation-detail', params: { id: conversation.id } }"
                       clickable
@@ -124,12 +130,13 @@
             <div class="col-12 col-md-6">
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">Top Contacts (1-2 yrs)</div>
+                  <div class="text-h6">Top Contacts</div>
+                  <div class="text-subtitle2">Past two years</div>
                 </q-card-section>
                 <q-card-section>
                   <q-list separator>
                     <q-item 
-                      v-for="person in dashboardData.top_contacts.slice(0, 5)" 
+                      v-for="person in dashboardData.top_contacts.slice(0, 8)" 
                       :key="person.id"
                       :to="{ name: 'person-detail', params: { id: person.id } }"
                       clickable
@@ -189,10 +196,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useQuasar } from 'quasar'
 import api from '@/services/api'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
-import WeeklyActivityChart from '@/components/WeeklyActivityChart.vue'
+import ActivityChart from '@/components/ActivityChart.vue'
+
+const $q = useQuasar()
 
 const leftDrawerOpen = ref(false)
 const dashboardData = ref({})

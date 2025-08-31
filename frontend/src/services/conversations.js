@@ -40,12 +40,12 @@ export const conversationsService = {
 }
 
 export const conversationTypes = [
-  { label: 'In Person', value: 'in_person', icon: 'people' },
-  { label: 'Phone Call', value: 'phone', icon: 'phone' },
-  { label: 'Text Message', value: 'text', icon: 'sms' },
-  { label: 'Email', value: 'email', icon: 'email' },
-  { label: 'Video Call', value: 'video', icon: 'videocam' },
-  { label: 'Other', value: 'other', icon: 'chat' }
+  { label: 'In Person', value: 'in_person', icon: 'people', color: 'primary' },
+  { label: 'Phone Call', value: 'phone', icon: 'phone', color: 'positive' },
+  { label: 'Text Message', value: 'text', icon: 'sms', color: 'info' },
+  { label: 'Email', value: 'email', icon: 'email', color: 'secondary' },
+  { label: 'Video Call', value: 'video', icon: 'videocam', color: 'accent' },
+  { label: 'Other', value: 'other', icon: 'chat', color: 'grey-6' }
 ]
 
 export const getConversationTypeIcon = (type) => {
@@ -56,4 +56,9 @@ export const getConversationTypeIcon = (type) => {
 export const getConversationTypeLabel = (type) => {
   const typeConfig = conversationTypes.find(t => t.value === type)
   return typeConfig?.label || 'Other'
+}
+
+export const getConversationTypeColor = (type) => {
+  const typeConfig = conversationTypes.find(t => t.value === type)
+  return typeConfig?.color || 'grey-6'
 }
