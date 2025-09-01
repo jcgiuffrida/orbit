@@ -252,7 +252,9 @@ const truncateText = (text, maxLength) => {
 
 const loadConversations = async () => {
   try {
-    await conversationsStore.fetchConversations()
+    // Force refresh if we have very few conversations (likely from direct navigation)
+    const shouldForceRefresh = conversationsStore.conversationsCount <= 1
+    await conversationsStore.fetchConversations(shouldForceRefresh)
   } catch (error) {
     console.error('Error loading conversations:', error)
   }

@@ -226,6 +226,15 @@ const form = reactive({
   private: false
 })
 
+const resetForm = () => {
+  form.person = ''
+  form.date = new Date().toISOString().split('T')[0]
+  form.type = ''
+  form.notes = ''
+  form.ledToConversation = false
+  form.private = false
+}
+
 const peopleOptions = computed(() => peopleStore.getPeopleList)
 
 const setLoading = (loading) => {
@@ -320,10 +329,23 @@ const saveContactAttempt = async () => {
       
       $q.notify({
         type: 'positive',
-        message: 'Contact attempt added successfully',
+        message: 'Ping added successfully',
         position: 'top',
-        timeout: 3000,
-        actions: [{ icon: 'close', color: 'white', dense: true }]
+        timeout: 6000,
+        actions: [
+          { 
+            icon: 'add', 
+            color: 'white', 
+            dense: true, 
+            label: 'Add Another',
+            handler: () => {
+              // Reset form to add another ping
+              resetForm()
+              router.push({ name: 'contact-attempt-create' })
+            }
+          },
+          { icon: 'close', color: 'white', dense: true }
+        ]
       })
       
       // If user indicated it led to a conversation, offer to create one

@@ -26,7 +26,7 @@
             <div class="col-auto">
               <div class="q-gutter-sm">
                 <q-btn 
-                  color="primary"
+                  color="accent"
                   icon="add_comment" 
                   :to="{ name: 'conversation-create' }"
                   :label="$q.screen.gt.xs ? 'New Conversation' : undefined"
@@ -42,7 +42,7 @@
                   <q-tooltip v-if="!$q.screen.gt.xs">New Ping</q-tooltip>
                 </q-btn>
                 <q-btn 
-                  color="accent"
+                  color="primary"
                   icon="person_add" 
                   :to="{ name: 'person-edit', params: {id: 'new' } }"
                   :label="$q.screen.gt.xs ? 'Add Person' : undefined"
@@ -79,17 +79,17 @@
                     <div class="col">
                       <div class="text-caption">Past Week</div>
                       <div class="text-h6">{{ dashboardData.activity_overview.conversations.week }} conversations</div>
-                      <div v-if="dashboardData.activity_overview.contact_attempts.week > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.week }} contact attempts</div>
+                      <div v-if="dashboardData.activity_overview.contact_attempts.week > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.week }} pings</div>
                     </div>
                     <div class="col">
                       <div class="text-caption">Past Month</div>
                       <div class="text-h6">{{ dashboardData.activity_overview.conversations.month }} conversations</div>
-                      <div v-if="dashboardData.activity_overview.contact_attempts.month > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.month }} contact attempts</div>
+                      <div v-if="dashboardData.activity_overview.contact_attempts.month > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.month }} pings</div>
                     </div>
                     <div class="col">
                       <div class="text-caption">Past Year</div>
                       <div class="text-h6">{{ dashboardData.activity_overview.conversations.year }} conversations</div>
-                      <div v-if="dashboardData.activity_overview.contact_attempts.year > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.year }} contact attempts</div>
+                      <div v-if="dashboardData.activity_overview.contact_attempts.year > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.year }} pings</div>
                     </div>
                   </div>
                 </q-card-section>

@@ -213,8 +213,8 @@
                 This action cannot be undone.
               </span>
             </q-card-section>
-            <q-card-actions align="right">
-              <q-btn flat label="Cancel" color="primary" @click="showDeleteDialog = false" />
+            <q-card-actions align="between">
+              <q-btn flat label="Cancel" color="grey-7" @click="showDeleteDialog = false" />
               <q-btn flat label="Delete" color="negative" @click="confirmDelete" />
             </q-card-actions>
           </q-card>

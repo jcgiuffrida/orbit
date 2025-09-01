@@ -8,11 +8,11 @@
       <q-page class="q-pa-md" style="background-color: #f8f9fa;">
         <!-- Header -->
         <div class="row items-center q-mb-lg">
-          <div class="text-h4 col">Contact Attempts</div>
+          <div class="text-h4 col">Pings</div>
           <q-btn 
             color="primary" 
             icon="add" 
-            label="Add Contact Attempt" 
+            label="Add Ping" 
             @click="addContactAttempt" 
           />
         </div>
@@ -23,7 +23,7 @@
             <q-input
               v-model="searchQuery"
               filled
-              placeholder="Search contact attempts..."
+              placeholder="Search pings..."
               clearable
             >
               <template v-slot:prepend>
@@ -57,7 +57,7 @@
         <!-- Contact Attempts Timeline -->
         <div v-if="contactAttemptsStore.isLoading" class="text-center q-pa-lg">
           <q-spinner-dots size="50px" color="primary" />
-          <div class="q-mt-md">Loading contact attempts...</div>
+          <div class="q-mt-md">Loading pings...</div>
         </div>
 
         <div v-else-if="contactAttemptsStore.hasError" class="text-center q-pa-xl">
@@ -76,7 +76,7 @@
         <div v-else-if="filteredContactAttempts.length === 0" class="text-center q-pa-xl">
           <q-icon name="contact_phone" size="80px" color="grey-5" />
           <div class="text-h6 text-grey-7 q-mt-md">
-            {{ searchQuery || filterType ? 'No contact attempts found matching your criteria' : 'No contact attempts recorded yet' }}
+            {{ searchQuery || filterType ? 'No pings found matching your criteria' : 'No pings recorded yet' }}
           </div>
           <q-btn 
             v-if="!searchQuery && !filterType"
@@ -99,7 +99,7 @@
                 <q-icon :name="getTypeIcon(attempt.type)" size="20px" />
               </q-avatar>
             </div>
-            <q-card class="timeline-card cursor-pointer" @click="viewContactAttempt(attempt)">
+            <q-card class="timeline-card cursor-pointer" @click="editContactAttempt(attempt)">
               <q-card-section>
                 <div class="row items-start justify-between">
                   <div class="col">
@@ -251,14 +251,12 @@ const truncateText = (text, maxLength) => {
 
 const loadContactAttempts = async () => {
   try {
-    await contactAttemptsStore.fetchContactAttempts()
+    // Force refresh if we have very few contact attempts (likely from direct navigation)
+    const shouldForceRefresh = contactAttemptsStore.contactAttemptsCount <= 1
+    await contactAttemptsStore.fetchContactAttempts(shouldForceRefresh)
   } catch (error) {
     console.error('Error loading contact attempts:', error)
   }
-}
-
-const viewContactAttempt = (attempt) => {
-  router.push({ name: 'contact-attempt-detail', params: { id: attempt.id } })
 }
 
 const addContactAttempt = () => {

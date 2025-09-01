@@ -162,6 +162,7 @@ def dashboard_analytics(request):
     today = now.date()
     week_ago = today - timedelta(days=7)
     month_ago = today - timedelta(days=30)
+    six_months_ago = today - timedelta(days=30 * 6)
     year_ago = today - timedelta(days=365)
     two_years_ago = today - timedelta(days=730)
     
@@ -217,15 +218,15 @@ def dashboard_analytics(request):
         conversations__isnull=False
     ).annotate(
         total_conversations=Count('conversations', filter=
-            Q(conversations__private=False) | Q(conversations__private=True, conversations__created_by=request.user)
+            Q(conversations__private=False) | Q(conversations__created_by=request.user)
         ),
         recent_conversations=Count('conversations', filter=
-            Q(conversations__date__gte=month_ago) &
-            (Q(conversations__private=False) | Q(conversations__private=True, conversations__created_by=request.user))
+            Q(conversations__date__gte=six_months_ago) &
+            (Q(conversations__private=False) | Q(conversations__created_by=request.user))
         )
     ).filter(
         total_conversations__gte=3,  # At least 3 total conversations
-        recent_conversations=0       # But none in past month
+        recent_conversations=0       # But none recently
     ).distinct()[:10]
     
     # Monthly activity data for chart (past 12 months)

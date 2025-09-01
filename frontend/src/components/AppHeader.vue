@@ -2,7 +2,7 @@
   <q-header elevated>
     <q-toolbar>
       <q-btn flat round dense icon="menu" @click="toggleDrawer" />
-      <q-toolbar-title>
+      <q-toolbar-title class="cursor-pointer" @click="goHome">
         Orbit
       </q-toolbar-title>
       <q-space />
@@ -23,6 +23,10 @@ const authStore = useAuthStore()
 
 const toggleDrawer = () => {
   emit('toggle-drawer')
+}
+
+const goHome = () => {
+  router.push({ name: 'home' })
 }
 
 const handleLogout = async () => {

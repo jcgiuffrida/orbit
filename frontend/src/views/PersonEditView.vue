@@ -208,6 +208,18 @@ const form = reactive({
   ai_summary: ''
 })
 
+const resetForm = () => {
+  form.name = ''
+  form.name_ext = ''
+  form.email = ''
+  form.phone = ''
+  form.location = ''
+  form.birthday = ''
+  form.how_we_met = ''
+  form.notes = ''
+  form.ai_summary = ''
+}
+
 // Methods
 const loadPerson = async () => {
   if (isCreating.value) return
@@ -259,8 +271,21 @@ const savePerson = async () => {
         type: 'positive',
         message: `Person ${newPerson.name} created successfully`,
         position: 'top',
-        timeout: 3000,
-        actions: [{ icon: 'close', color: 'white', dense: true }]
+        timeout: 6000,
+        actions: [
+          { 
+            icon: 'add', 
+            color: 'white', 
+            dense: true, 
+            label: 'Add Another',
+            handler: () => {
+              // Reset form to add another person
+              resetForm()
+              router.push({ name: 'person-edit', params: { id: 'new' } })
+            }
+          },
+          { icon: 'close', color: 'white', dense: true }
+        ]
       })
       
       // Navigate to the new person's detail page

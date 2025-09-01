@@ -234,6 +234,15 @@ const form = reactive({
   private: false
 })
 
+const resetForm = () => {
+  form.participants = []
+  form.date = new Date().toISOString().split('T')[0]
+  form.type = ''
+  form.location = ''
+  form.notes = ''
+  form.private = false
+}
+
 const peopleOptions = computed(() => peopleStore.getPeopleList)
 
 const setLoading = (loading) => {
@@ -331,8 +340,21 @@ const saveConversation = async () => {
         type: 'positive',
         message: 'Conversation added successfully',
         position: 'top',
-        timeout: 3000,
-        actions: [{ icon: 'close', color: 'white', dense: true }]
+        timeout: 6000,
+        actions: [
+          { 
+            icon: 'add', 
+            color: 'white', 
+            dense: true, 
+            label: 'Add Another',
+            handler: () => {
+              // Reset form to add another conversation
+              resetForm()
+              router.push({ name: 'conversation-create' })
+            }
+          },
+          { icon: 'close', color: 'white', dense: true }
+        ]
       })
       
       // Navigate to detail view

@@ -100,12 +100,6 @@ const chartOptions = computed(() => {
     },
     plotOptions: {
       line: {
-        marker: {
-          enabled: true,
-          radius: 4,
-          lineWidth: 2,
-          lineColor: '#ffffff'
-        },
         lineWidth: 3,
         states: {
           hover: {
