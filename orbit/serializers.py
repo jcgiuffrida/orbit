@@ -49,15 +49,19 @@ class ConversationSerializer(serializers.ModelSerializer):
         source='participants',
         write_only=True
     )
+    participant_names = serializers.SerializerMethodField()
     created_by_username = serializers.ReadOnlyField(source='created_by.username')
+
+    def get_participant_names(self, obj):
+        return [participant.name for participant in obj.participants.all()]
 
     class Meta:
         model = Conversation
         fields = [
-            'id', 'participants', 'participant_ids', 'date', 'type', 
+            'id', 'participants', 'participant_ids', 'participant_names', 'date', 'type', 
             'location', 'notes', 'private', 'created_by_username', 'created_at'
         ]
-        read_only_fields = ['created_at', 'participants', 'created_by_username']
+        read_only_fields = ['created_at', 'participants', 'participant_names', 'created_by_username']
 
 
 class ContactAttemptSerializer(serializers.ModelSerializer):
