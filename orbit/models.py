@@ -12,7 +12,9 @@ class Person(models.Model):
     location = models.CharField("City or state", blank=True)
     address = models.TextField(blank=True)
     company = models.CharField(blank=True)
-    birthday = models.DateField(blank=True, null=True)
+    birthday_month = models.IntegerField(blank=True, null=True, choices=[(i, i) for i in range(1, 13)])
+    birthday_day = models.IntegerField(blank=True, null=True, choices=[(i, i) for i in range(1, 32)])
+    birth_year = models.IntegerField(blank=True, null=True)
     how_we_met = models.TextField(blank=True)
     notes = models.TextField(blank=True)
     ai_summary = models.TextField(blank=True)
@@ -28,6 +30,49 @@ class Person(models.Model):
     def last_contacted(self):
         last_conversation = self.conversations.order_by('-date').first()
         return last_conversation.date if last_conversation else None
+    
+    @property
+    def birthday(self):
+        """Return a date object for the birthday, using current year if birth_year is unknown"""
+        if self.birthday_month and self.birthday_day:
+            from datetime import date
+            year = self.birth_year or date.today().year
+            try:
+                return date(year, self.birthday_month, self.birthday_day)
+            except ValueError:
+                # Handle invalid dates like Feb 29 on non-leap years
+                return None
+        return None
+    
+    @property
+    def birthday_display(self):
+        """Return a formatted birthday string"""
+        if self.birthday_month and self.birthday_day:
+            from datetime import date
+            month_names = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December']
+            month_name = month_names[self.birthday_month]
+            if self.birth_year:
+                return f"{month_name} {self.birthday_day}, {self.birth_year}"
+            else:
+                return f"{month_name} {self.birthday_day}"
+        return None
+    
+    @property
+    def age(self):
+        """Return age if birth year is known"""
+        if self.birth_year and self.birthday_month and self.birthday_day:
+            from datetime import date
+            today = date.today()
+            try:
+                birthday_this_year = date(today.year, self.birthday_month, self.birthday_day)
+                age = today.year - self.birth_year
+                if today < birthday_this_year:
+                    age -= 1
+                return age
+            except ValueError:
+                return None
+        return None
 
 
 class Conversation(models.Model):

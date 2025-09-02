@@ -10,7 +10,9 @@ class PersonModelTest(TestCase):
             name_ext="test context",
             email="test@example.com",
             phone="555-1234",
-            birthday=date(1990, 1, 15),
+            birthday_month=1,
+            birthday_day=15,
+            birth_year=1990,
             how_we_met="Through testing",
             notes="This is a test person"
         )
@@ -20,6 +22,9 @@ class PersonModelTest(TestCase):
         self.assertEqual(self.person.name_ext, "test context")
         self.assertEqual(self.person.email, "test@example.com")
         self.assertEqual(self.person.phone, "555-1234")
+        self.assertEqual(self.person.birthday_month, 1)
+        self.assertEqual(self.person.birthday_day, 15)
+        self.assertEqual(self.person.birth_year, 1990)
         self.assertEqual(self.person.birthday, date(1990, 1, 15))
         self.assertTrue(self.person.created_at)
 
@@ -53,7 +58,97 @@ class PersonModelTest(TestCase):
         self.assertEqual(person.how_we_met, "")
         self.assertEqual(person.notes, "")
         self.assertEqual(person.ai_summary, "")
+        self.assertIsNone(person.birthday_month)
+        self.assertIsNone(person.birthday_day)
+        self.assertIsNone(person.birth_year)
         self.assertIsNone(person.birthday)
+
+    def test_birthday_without_year(self):
+        """Test birthday with month and day but no year"""
+        person = Person.objects.create(
+            name="Jane Doe",
+            birthday_month=3,
+            birthday_day=22
+        )
+        self.assertEqual(person.birthday_month, 3)
+        self.assertEqual(person.birthday_day, 22)
+        self.assertIsNone(person.birth_year)
+        # birthday property should use current year
+        self.assertIsNotNone(person.birthday)
+        self.assertEqual(person.birthday.month, 3)
+        self.assertEqual(person.birthday.day, 22)
+        # birthday_display should not show year
+        self.assertEqual(person.birthday_display, "March 22")
+        # age should be None when year is unknown
+        self.assertIsNone(person.age)
+
+    def test_birthday_display_with_year(self):
+        """Test birthday display includes year when known"""
+        person = Person.objects.create(
+            name="John Doe",
+            birthday_month=7,
+            birthday_day=4,
+            birth_year=1985
+        )
+        self.assertEqual(person.birthday_display, "July 4, 1985")
+        self.assertIsNotNone(person.age)
+
+    def test_invalid_birthday_handling(self):
+        """Test handling of invalid dates like Feb 29 on non-leap years"""
+        person = Person.objects.create(
+            name="Leap Year Baby",
+            birthday_month=2,
+            birthday_day=29,
+            birth_year=2021  # 2021 is not a leap year
+        )
+        # The birthday property should handle this gracefully
+        self.assertIsNone(person.birthday)  # Invalid date returns None
+
+    def test_upcoming_birthdays_logic(self):
+        """Test the upcoming birthdays helper function"""
+        from datetime import date, timedelta
+        from orbit.views import get_upcoming_birthdays
+        
+        today = date.today()
+        tomorrow = today + timedelta(days=1)
+        next_week = today + timedelta(days=7)
+        
+        # Create people with birthdays
+        person_today = Person.objects.create(
+            name="Birthday Today",
+            birthday_month=today.month,
+            birthday_day=today.day,
+            birth_year=1990
+        )
+        
+        person_tomorrow = Person.objects.create(
+            name="Birthday Tomorrow", 
+            birthday_month=tomorrow.month,
+            birthday_day=tomorrow.day,
+            birth_year=1985
+        )
+        
+        person_next_week = Person.objects.create(
+            name="Birthday Next Week",
+            birthday_month=next_week.month,
+            birthday_day=next_week.day
+        )
+        
+        # Test upcoming birthdays in next 10 days
+        upcoming = get_upcoming_birthdays(days_ahead=10)
+        
+        # Should find all three people
+        self.assertEqual(len(upcoming), 3)
+        
+        # Check they're sorted by days_until
+        self.assertEqual(upcoming[0]['days_until'], 0)  # Today
+        self.assertEqual(upcoming[1]['days_until'], 1)  # Tomorrow
+        self.assertEqual(upcoming[2]['days_until'], 7)  # Next week
+        
+        # Check is_today flag
+        self.assertTrue(upcoming[0]['is_today'])
+        self.assertFalse(upcoming[1]['is_today'])
+        self.assertFalse(upcoming[2]['is_today'])
 
 
 class ConversationModelTest(TestCase):

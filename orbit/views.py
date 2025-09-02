@@ -150,6 +150,50 @@ def csrf_token(request):
     return Response({'csrfToken': get_token(request)})
 
 
+def get_upcoming_birthdays(days_ahead=30):
+    """Get upcoming birthdays in the next N days"""
+    from datetime import date
+    from .serializers import PersonSerializer
+    
+    today = date.today()
+    birthdays = []
+    
+    # Get all people with birthdays (month and day must be present)
+    people_with_birthdays = Person.objects.filter(
+        birthday_month__isnull=False,
+        birthday_day__isnull=False
+    ).select_related()
+    
+    for person in people_with_birthdays:
+        # Calculate next birthday occurrence
+        try:
+            # Try this year first
+            birthday_this_year = date(today.year, person.birthday_month, person.birthday_day)
+            
+            if birthday_this_year >= today:
+                next_birthday = birthday_this_year
+            else:
+                # Birthday has passed this year, use next year
+                next_birthday = date(today.year + 1, person.birthday_month, person.birthday_day)
+                
+            days_until = (next_birthday - today).days
+            
+            if days_until <= days_ahead:
+                birthday_data = PersonSerializer(person).data
+                birthday_data['next_birthday'] = next_birthday.isoformat()
+                birthday_data['days_until'] = days_until
+                birthday_data['is_today'] = days_until == 0
+                birthdays.append(birthday_data)
+                
+        except ValueError:
+            # Handle invalid dates (like Feb 29 on non-leap years)
+            continue
+    
+    # Sort by days until birthday
+    birthdays.sort(key=lambda x: x['days_until'])
+    return birthdays
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def dashboard_analytics(request):
@@ -276,6 +320,9 @@ def dashboard_analytics(request):
     
     monthly_data.reverse()  # Show chronologically (oldest first)
     
+    # Upcoming birthdays in the next 30 days
+    upcoming_birthdays = get_upcoming_birthdays(days_ahead=30)
+    
     return Response({
         'recent_conversations': ConversationSerializer(recent_conversations, many=True).data,
         'top_contacts': PersonSerializer(top_contacts, many=True).data,
@@ -292,7 +339,8 @@ def dashboard_analytics(request):
             }
         },
         'people_to_reach_out': PersonSerializer(people_to_reach_out, many=True).data,
-        'monthly_activity': monthly_data
+        'monthly_activity': monthly_data,
+        'upcoming_birthdays': upcoming_birthdays
     })
 
 
@@ -318,6 +366,16 @@ def conversation_location_suggestions(request):
     """Get unique conversation location suggestions for auto-complete"""
     locations = Conversation.objects.exclude(location='').values_list('location', flat=True).distinct()
     return Response({'locations': sorted(set(locations))})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def birthday_timeline(request):
+    """Get birthday timeline starting from today"""
+    days_ahead = int(request.GET.get('days', 365))  # Default to 1 year
+    return Response({
+        'birthdays': get_upcoming_birthdays(days_ahead=days_ahead)
+    })
 
 
 # Frontend view

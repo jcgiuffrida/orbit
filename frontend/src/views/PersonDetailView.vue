@@ -170,11 +170,14 @@
                     </div>
                   </div>
 
-                  <div v-if="person.birthday" class="contact-item q-mb-md">
+                  <div v-if="person.birthday_display" class="contact-item q-mb-md">
                     <div class="row items-center q-gutter-sm">
                       <q-icon name="cake" size="20px" color="grey-7" />
                       <div class="col">
-                        <div class="text-body1">{{ formatBirthday(person.birthday) }}</div>
+                        <div class="text-body1">
+                          {{ person.birthday_display }}
+                          <span v-if="person.age" class="text-grey-6">(Age {{ person.age }})</span>
+                        </div>
                         <div class="text-caption text-grey-6">Birthday</div>
                       </div>
                     </div>
@@ -486,15 +489,6 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString()
 }
 
-const formatBirthday = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString(undefined, { 
-    month: 'long', 
-    day: 'numeric',
-    year: 'numeric'
-  })
-}
 
 const formatConversationDate = (dateString) => {
   if (!dateString) return ''

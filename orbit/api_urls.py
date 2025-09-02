@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     PersonViewSet, ConversationViewSet, ContactAttemptViewSet, RelationshipViewSet,
     current_user, login_view, logout_view, csrf_token, dashboard_analytics,
-    location_suggestions, company_suggestions, conversation_location_suggestions
+    location_suggestions, company_suggestions, conversation_location_suggestions,
+    birthday_timeline
 )
 
 router = DefaultRouter()
@@ -15,6 +16,7 @@ router.register('relationships', RelationshipViewSet, basename='relationship')
 urlpatterns = [
     path('', include(router.urls)),
     path('dashboard/', dashboard_analytics, name='dashboard-analytics'),
+    path('birthdays/', birthday_timeline, name='birthday-timeline'),
     path('suggestions/locations/', location_suggestions, name='location-suggestions'),
     path('suggestions/companies/', company_suggestions, name='company-suggestions'),
     path('suggestions/conversation-locations/', conversation_location_suggestions, name='conversation-location-suggestions'),

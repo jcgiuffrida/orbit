@@ -147,14 +147,51 @@
                       class="q-mb-md"
                     />
                     
-                    <q-input
-                      v-model="form.birthday"
-                      label="Birthday"
-                      type="date"
-                      filled
-                      autocomplete="off"
-                      class="q-mb-md"
-                    />
+                    <!-- Birthday Fields -->
+                    <div class="text-subtitle2 q-mb-sm">Birthday</div>
+                    <div class="row q-gutter-md q-mb-md">
+                      <div class="col">
+                        <q-select
+                          v-model="form.birthdayMonth"
+                          :options="monthOptions"
+                          label="Month"
+                          filled
+                          clearable
+                          autocomplete="off"
+                          option-value="value"
+                          option-label="label"
+                          emit-value
+                          map-options
+                        />
+                      </div>
+                      <div class="col-3">
+                        <q-select
+                          v-model="form.birthdayDay"
+                          :options="dayOptions"
+                          label="Day"
+                          filled
+                          clearable
+                          autocomplete="off"
+                          option-value="value"
+                          option-label="label"
+                          emit-value
+                          map-options
+                        />
+                      </div>
+                      <div class="col-3">
+                        <q-input
+                          v-model.number="form.birthYear"
+                          label="Year (optional)"
+                          type="number"
+                          filled
+                          clearable
+                          autocomplete="off"
+                          hint="Leave blank if unknown"
+                          min="1900"
+                          :max="new Date().getFullYear()"
+                        />
+                      </div>
+                    </div>
                     
                   </q-card-section>
                 </q-card>
@@ -248,11 +285,34 @@ const form = reactive({
   location: '',
   address: '',
   company: '',
-  birthday: '',
+  birthdayMonth: null,
+  birthdayDay: null,
+  birthYear: null,
   how_we_met: '',
   notes: '',
   ai_summary: ''
 })
+
+// Birthday options
+const monthOptions = [
+  { value: 1, label: 'January' },
+  { value: 2, label: 'February' },
+  { value: 3, label: 'March' },
+  { value: 4, label: 'April' },
+  { value: 5, label: 'May' },
+  { value: 6, label: 'June' },
+  { value: 7, label: 'July' },
+  { value: 8, label: 'August' },
+  { value: 9, label: 'September' },
+  { value: 10, label: 'October' },
+  { value: 11, label: 'November' },
+  { value: 12, label: 'December' }
+]
+
+const dayOptions = Array.from({ length: 31 }, (_, i) => ({
+  value: i + 1,
+  label: (i + 1).toString()
+}))
 
 // Auto-complete data
 const allLocationOptions = ref([])
@@ -268,7 +328,9 @@ const resetForm = () => {
   form.location = ''
   form.address = ''
   form.company = ''
-  form.birthday = ''
+  form.birthdayMonth = null
+  form.birthdayDay = null
+  form.birthYear = null
   form.how_we_met = ''
   form.notes = ''
   form.ai_summary = ''
@@ -286,14 +348,22 @@ const loadPerson = async () => {
       
       // Populate form with existing data
       if (originalPerson.value) {
-        Object.keys(form).forEach(key => {
-          form[key] = originalPerson.value[key] || ''
-        })
+        // Map basic fields
+        form.name = originalPerson.value.name || ''
+        form.name_ext = originalPerson.value.name_ext || ''
+        form.email = originalPerson.value.email || ''
+        form.phone = originalPerson.value.phone || ''
+        form.location = originalPerson.value.location || ''
+        form.address = originalPerson.value.address || ''
+        form.company = originalPerson.value.company || ''
+        form.how_we_met = originalPerson.value.how_we_met || ''
+        form.notes = originalPerson.value.notes || ''
+        form.ai_summary = originalPerson.value.ai_summary || ''
         
-        // Format dates for input fields
-        if (originalPerson.value.birthday) {
-          form.birthday = formatDateForInput(originalPerson.value.birthday)
-        }
+        // Map birthday fields
+        form.birthdayMonth = originalPerson.value.birthday_month || null
+        form.birthdayDay = originalPerson.value.birthday_day || null
+        form.birthYear = originalPerson.value.birth_year || null
       }
     } catch (error) {
       console.error('Failed to load person:', error)
@@ -301,29 +371,26 @@ const loadPerson = async () => {
   }
 }
 
-const formatDateForInput = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toISOString().split('T')[0]
-}
 
 const savePerson = async () => {
   isSaving.value = true
   
   try {
-    // Prepare form data - send empty strings as-is, backend expects them
-    const personData = { ...form }
-    
-    // Handle null values for CharField fields - convert to empty string
-    if (personData.location === null) {
-      personData.location = ''
-    }
-    if (personData.company === null) {
-      personData.company = ''
-    }
-    
-    if (!personData.birthday) {
-      personData.birthday = null
+    // Prepare form data for backend
+    const personData = {
+      name: form.name,
+      name_ext: form.name_ext,
+      email: form.email,
+      phone: form.phone,
+      location: form.location === null ? '' : form.location,
+      address: form.address,
+      company: form.company === null ? '' : form.company,
+      birthday_month: form.birthdayMonth,
+      birthday_day: form.birthdayDay,
+      birth_year: form.birthYear,
+      how_we_met: form.how_we_met,
+      notes: form.notes,
+      ai_summary: form.ai_summary
     }
     
     if (isCreating.value) {

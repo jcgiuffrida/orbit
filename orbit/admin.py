@@ -5,12 +5,12 @@ from .models import Person, Conversation, ContactAttempt, Relationship
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'name_ext', 'location', 'email', 'phone', 'conversations_')
-    list_filter = ('created_at', 'birthday', 'location')
+    list_filter = ('created_at', 'birthday_month', 'location')
     search_fields = ('name', 'name_ext', 'location', 'email', 'how_we_met', 'notes')
     readonly_fields = ('created_at',)
     fieldsets = (
         ('Basic Info', {
-            'fields': ('name', 'name_ext', 'location', 'email', 'phone', 'birthday')
+            'fields': ('name', 'name_ext', 'location', 'address', 'company', 'email', 'phone', 'birthday_month', 'birthday_day', 'birth_year')
         }),
         ('Background', {
             'fields': ('how_we_met', 'notes')

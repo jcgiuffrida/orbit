@@ -157,6 +157,65 @@
             </div>
           </div>
 
+          <!-- Upcoming Birthdays -->
+          <div class="row q-mb-lg" v-if="dashboardData.upcoming_birthdays && dashboardData.upcoming_birthdays.length > 0">
+            <div class="col-12">
+              <q-card>
+                <q-card-section>
+                  <div class="row items-center">
+                    <div class="col">
+                      <div class="text-h6">
+                        Upcoming Birthdays
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <q-btn flat dense :to="{ name: 'birthdays' }" color="primary">
+                        View Calendar
+                        <q-icon name="chevron_right" />
+                      </q-btn>
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-col-gutter-md">
+                    <div 
+                      v-for="birthday in dashboardData.upcoming_birthdays.slice(0, 6)" 
+                      :key="birthday.id"
+                      class="col-12 col-sm-6 col-md-4 col-lg-3"
+                    >
+                      <div 
+                        class="birthday-item q-pa-sm rounded-borders cursor-pointer"
+                        :class="{ 'bg-accent text-white': birthday.is_today, 'bg-grey-3': !birthday.is_today }"
+                        @click="goToPerson(birthday.id)"
+                      >
+                        <div class="row items-center q-gutter-sm">
+                          <div class="col-auto">
+                            <q-icon 
+                              :name="birthday.is_today ? 'celebration' : 'cake'" 
+                              size="24px"
+                              :color="birthday.is_today ? 'white' : 'primary'"
+                            />
+                          </div>
+                          <div class="col">
+                            <div :class="birthday.is_today ? 'text-white' : 'text-body1'" class="text-weight-medium">
+                              {{ birthday.name }}
+                            </div>
+                            <div :class="birthday.is_today ? 'text-white' : 'text-caption text-grey-6'">
+                              <span v-if="birthday.is_today" class="text-weight-bold">Today!</span>
+                              <span v-else-if="birthday.days_until === 1">Tomorrow</span>
+                              <span v-else>{{ birthday.days_until }} days</span>
+                              <span v-if="birthday.age" class="q-ml-sm">({{ birthday.age }})</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+
           <!-- People to Reach Out -->
           <div class="row">
             <div class="col-12">
@@ -234,6 +293,10 @@ const formatDate = (dateString) => {
 
 const pluralize = (count, singular, plural) => {
   return count === 1 ? singular : plural
+}
+
+const goToPerson = (personId) => {
+  router.push({ name: 'person-detail', params: { id: personId } })
 }
 
 onMounted(() => {

@@ -75,6 +75,12 @@ const router = createRouter({
       component: () => import('@/views/ContactAttemptCreateView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/birthdays',
+      name: 'birthdays',
+      component: () => import('@/views/BirthdaysView.vue'),
+      meta: { requiresAuth: true }
+    },
   ]
 })
 

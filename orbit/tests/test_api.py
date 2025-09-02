@@ -53,7 +53,9 @@ class PersonAPITest(APITestCase):
             name_ext="from work",
             email="alice@example.com",
             phone="555-1234",
-            birthday=date(1990, 5, 15),
+            birthday_month=5,
+            birthday_day=15,
+            birth_year=1990,
             how_we_met="Work colleague",
             notes="Great at presentations",
             created_by=self.user

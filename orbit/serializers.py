@@ -15,14 +15,16 @@ class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = [
-            'id', 'name', 'name_ext', 'email', 'phone', 'location', 'address', 'company', 'birthday',
+            'id', 'name', 'name_ext', 'email', 'phone', 'location', 'address', 'company', 
+            'birthday_month', 'birthday_day', 'birth_year', 'birthday', 'birthday_display', 'age',
             'how_we_met', 'notes', 'ai_summary', 'created_by_username', 
             'created_at', 'last_contacted', 'conversation_count', 
             'conversation_count_recent', 'days_since_last_contact'
         ]
         read_only_fields = [
             'created_at', 'last_contacted', 'created_by_username', 
-            'conversation_count', 'conversation_count_recent', 'days_since_last_contact'
+            'conversation_count', 'conversation_count_recent', 'days_since_last_contact',
+            'birthday', 'birthday_display', 'age'
         ]
 
     def get_conversation_count(self, obj):
