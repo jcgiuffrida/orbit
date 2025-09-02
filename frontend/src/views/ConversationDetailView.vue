@@ -70,7 +70,7 @@
                       {{ getTypeLabel(conversation.type) }}
                     </q-chip>
                     <q-chip v-if="conversation.private" color="orange" text-color="white" icon="lock">
-                      Private
+                      Private to you
                     </q-chip>
                   </div>
                   <div class="text-body1 text-grey-8 q-mb-sm">
@@ -97,14 +97,6 @@
                     />
                     <q-btn 
                       outline
-                      color="positive" 
-                      icon="add_comment" 
-                      label="Follow-up"
-                      class="q-mr-sm"
-                      @click="followUpConversation"
-                    />
-                    <q-btn 
-                      outline
                       color="negative" 
                       icon="delete" 
                       label="Delete"
@@ -120,48 +112,6 @@
           <div class="row q-col-gutter-lg">
             <!-- Left Column - Details -->
             <div class="col-12 col-md-4">
-              <!-- Conversation Details Card -->
-              <q-card class="content-card q-mb-lg" flat bordered>
-                <q-card-section class="q-pa-lg">
-                  <div class="text-h6 q-mb-md text-weight-medium">Details</div>
-                  
-                  <div class="detail-item q-mb-md">
-                    <div class="row items-center q-gutter-sm">
-                      <q-icon :name="getTypeIcon(conversation.type)" size="20px" :color="getTypeColor(conversation.type)" />
-                      <div class="col">
-                        <div class="text-body1">{{ getTypeLabel(conversation.type) }}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="detail-item q-mb-md">
-                    <div class="row items-center q-gutter-sm">
-                      <q-icon name="event" size="20px" color="grey-7" />
-                      <div class="col">
-                        <div class="text-body1">{{ formatDateLong(conversation.date) }}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="conversation.location" class="detail-item q-mb-md">
-                    <div class="row items-center q-gutter-sm">
-                      <q-icon name="place" size="20px" color="grey-7" />
-                      <div class="col">
-                        <div class="text-body1">{{ conversation.location }}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="detail-item" v-if="conversation.private">
-                    <div class="row items-center q-gutter-sm">
-                      <q-icon name="lock" size="20px" color="orange" />
-                      <div class="col">
-                        <div class="text-body1">Private to you</div>
-                      </div>
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
 
               <!-- Participants Card (only show if more than one participant) -->
               <q-card class="content-card" flat bordered>
@@ -271,16 +221,6 @@ const goBack = () => {
 const editConversation = () => {
   if (conversation.value) {
     router.push({ name: 'conversation-edit', params: { id: conversation.value.id } })
-  }
-}
-
-const followUpConversation = () => {
-  if (conversation.value) {
-    const participantIds = conversation.value.participants.map(p => p.id)
-    router.push({ 
-      name: 'conversation-create', 
-      query: { participants: participantIds.join(','), followup: conversation.value.id } 
-    })
   }
 }
 

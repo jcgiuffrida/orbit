@@ -312,6 +312,14 @@ def company_suggestions(request):
     return Response({'companies': sorted(set(companies))})
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def conversation_location_suggestions(request):
+    """Get unique conversation location suggestions for auto-complete"""
+    locations = Conversation.objects.exclude(location='').values_list('location', flat=True).distinct()
+    return Response({'locations': sorted(set(locations))})
+
+
 # Frontend view
 def index_view(request):
     """Serve the Vue.js frontend"""

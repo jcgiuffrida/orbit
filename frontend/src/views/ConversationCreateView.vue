@@ -129,14 +129,27 @@
                     </q-select>
                     
                     <!-- Location -->
-                    <q-input
+                    <q-select
                       v-model="form.location"
                       label="Location"
                       hint="Where did this conversation take place?"
                       filled
-                      autocomplete="off"
+                      use-input
+                      clearable
+                      input-debounce="0"
+                      new-value-mode="add-unique"
+                      :options="conversationLocationOptions"
+                      @filter="filterConversationLocations"
                       class="q-mb-md"
-                    />
+                    >
+                      <template v-slot:no-option>
+                        <q-item>
+                          <q-item-section class="text-grey">
+                            Type to add new location
+                          </q-item-section>
+                        </q-item>
+                      </template>
+                    </q-select>
                   </q-card-section>
                 </q-card>
 
@@ -234,6 +247,10 @@ const form = reactive({
   private: false
 })
 
+// Auto-complete data for conversation locations
+const allConversationLocationOptions = ref([])
+const conversationLocationOptions = ref([])
+
 const resetForm = () => {
   form.participants = []
   form.date = new Date().toISOString().split('T')[0]
@@ -313,7 +330,7 @@ const saveConversation = async () => {
       participant_ids: form.participants,
       date: form.date,
       type: form.type,
-      location: form.location || '',
+      location: form.location === null ? '' : (form.location || ''),
       notes: form.notes,
       private: form.private
     }
@@ -391,6 +408,31 @@ const goToDetail = () => {
   }
 }
 
+// Auto-complete methods for conversation locations
+const loadConversationLocationSuggestions = async () => {
+  try {
+    const response = await fetch('/api/suggestions/conversation-locations/')
+    const data = await response.json()
+    allConversationLocationOptions.value = data.locations || []
+    conversationLocationOptions.value = [...allConversationLocationOptions.value]
+  } catch (error) {
+    console.error('Failed to load conversation location suggestions:', error)
+  }
+}
+
+const filterConversationLocations = (val, update) => {
+  update(() => {
+    if (val === '') {
+      conversationLocationOptions.value = [...allConversationLocationOptions.value]
+    } else {
+      const needle = val.toLowerCase()
+      conversationLocationOptions.value = allConversationLocationOptions.value.filter(v => 
+        v.toLowerCase().indexOf(needle) > -1
+      )
+    }
+  })
+}
+
 // Watch for route parameter changes
 watch(() => route.params.id, (newId, oldId) => {
   if (newId && newId !== oldId) {
@@ -400,6 +442,7 @@ watch(() => route.params.id, (newId, oldId) => {
 
 onMounted(() => {
   loadData()
+  loadConversationLocationSuggestions()
 })
 </script>
 
