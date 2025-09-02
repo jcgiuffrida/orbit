@@ -69,14 +69,58 @@
                       class="q-mb-md"
                     />
                     
-                    <q-input
+                    <q-select
                       v-model="form.location"
                       label="Location"
                       hint="City or state"
                       filled
+                      use-input
+                      clearable
+                      input-debounce="0"
+                      new-value-mode="add-unique"
+                      :options="locationOptions"
+                      @filter="filterLocations"
+                      class="q-mb-md"
+                    >
+                      <template v-slot:no-option>
+                        <q-item>
+                          <q-item-section class="text-grey">
+                            Type to add new location
+                          </q-item-section>
+                        </q-item>
+                      </template>
+                    </q-select>
+                    
+                    <q-input
+                      v-model="form.address"
+                      label="Address"
+                      type="textarea"
+                      filled
                       autocomplete="off"
                       class="q-mb-md"
+                      rows="3"
                     />
+                    
+                    <q-select
+                      v-model="form.company"
+                      label="Company"
+                      filled
+                      use-input
+                      clearable
+                      input-debounce="0"
+                      new-value-mode="add-unique"
+                      :options="companyOptions"
+                      @filter="filterCompanies"
+                      class="q-mb-md"
+                    >
+                      <template v-slot:no-option>
+                        <q-item>
+                          <q-item-section class="text-grey">
+                            Type to add new company
+                          </q-item-section>
+                        </q-item>
+                      </template>
+                    </q-select>
                   </q-card-section>
                 </q-card>
 
@@ -202,11 +246,19 @@ const form = reactive({
   email: '',
   phone: '',
   location: '',
+  address: '',
+  company: '',
   birthday: '',
   how_we_met: '',
   notes: '',
   ai_summary: ''
 })
+
+// Auto-complete data
+const allLocationOptions = ref([])
+const allCompanyOptions = ref([])
+const locationOptions = ref([])
+const companyOptions = ref([])
 
 const resetForm = () => {
   form.name = ''
@@ -214,6 +266,8 @@ const resetForm = () => {
   form.email = ''
   form.phone = ''
   form.location = ''
+  form.address = ''
+  form.company = ''
   form.birthday = ''
   form.how_we_met = ''
   form.notes = ''
@@ -259,6 +313,15 @@ const savePerson = async () => {
   try {
     // Prepare form data - send empty strings as-is, backend expects them
     const personData = { ...form }
+    
+    // Handle null values for CharField fields - convert to empty string
+    if (personData.location === null) {
+      personData.location = ''
+    }
+    if (personData.company === null) {
+      personData.company = ''
+    }
+    
     if (!personData.birthday) {
       personData.birthday = null
     }
@@ -336,10 +399,61 @@ const goToDetail = () => {
   }
 }
 
+// Auto-complete methods
+const loadLocationSuggestions = async () => {
+  try {
+    const response = await fetch('/api/suggestions/locations/')
+    const data = await response.json()
+    allLocationOptions.value = data.locations || []
+    locationOptions.value = [...allLocationOptions.value]
+  } catch (error) {
+    console.error('Failed to load location suggestions:', error)
+  }
+}
+
+const loadCompanySuggestions = async () => {
+  try {
+    const response = await fetch('/api/suggestions/companies/')
+    const data = await response.json()
+    allCompanyOptions.value = data.companies || []
+    companyOptions.value = [...allCompanyOptions.value]
+  } catch (error) {
+    console.error('Failed to load company suggestions:', error)
+  }
+}
+
+const filterLocations = (val, update) => {
+  update(() => {
+    if (val === '') {
+      locationOptions.value = [...allLocationOptions.value]
+    } else {
+      const needle = val.toLowerCase()
+      locationOptions.value = allLocationOptions.value.filter(v => 
+        v.toLowerCase().indexOf(needle) > -1
+      )
+    }
+  })
+}
+
+const filterCompanies = (val, update) => {
+  update(() => {
+    if (val === '') {
+      companyOptions.value = [...allCompanyOptions.value]
+    } else {
+      const needle = val.toLowerCase()
+      companyOptions.value = allCompanyOptions.value.filter(v => 
+        v.toLowerCase().indexOf(needle) > -1
+      )
+    }
+  })
+}
+
 
 // Lifecycle
 onMounted(() => {
   loadPerson()
+  loadLocationSuggestions()
+  loadCompanySuggestions()
 })
 </script>
 

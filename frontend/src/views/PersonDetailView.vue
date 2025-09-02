@@ -120,6 +120,20 @@
                     </div>
                   </div>
                   
+                  <div v-if="person.address" class="contact-item q-mb-md">
+                    <div class="row items-start q-gutter-sm">
+                      <q-icon name="home" size="20px" color="grey-7" style="margin-top: 2px;" />
+                      <div class="col text-body1" style="white-space: pre-line;">{{ person.address }}</div>
+                    </div>
+                  </div>
+                  
+                  <div v-if="person.company" class="contact-item q-mb-md">
+                    <div class="row items-center q-gutter-sm">
+                      <q-icon name="business" size="20px" color="grey-7" />
+                      <div class="col text-body1">{{ person.company }}</div>
+                    </div>
+                  </div>
+                  
                   <div v-if="person.email" class="contact-item q-mb-md">
                     <div class="row items-center q-gutter-sm">
                       <q-icon name="email" size="20px" color="grey-7" />

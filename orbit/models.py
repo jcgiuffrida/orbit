@@ -10,6 +10,8 @@ class Person(models.Model):
     email = models.EmailField(blank=True)
     phone = models.CharField(blank=True)
     location = models.CharField("City or state", blank=True)
+    address = models.TextField(blank=True)
+    company = models.CharField(blank=True)
     birthday = models.DateField(blank=True, null=True)
     how_we_met = models.TextField(blank=True)
     notes = models.TextField(blank=True)

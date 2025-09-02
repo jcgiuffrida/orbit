@@ -80,6 +80,10 @@
                   <q-icon name="place" size="16px" class="q-mr-xs" />
                   {{ person.location }}
                 </div>
+                <div v-if="person.company" class="text-body2 text-grey-8 q-mb-sm">
+                  <q-icon name="business" size="16px" class="q-mr-xs" />
+                  {{ person.company }}
+                </div>
                 <div v-if="person.last_contacted" class="text-caption" :class="getLastContactTextClass(person.last_contacted)">
                   <q-icon name="schedule" size="14px" class="q-mr-xs" :color="getLastContactColor(person.last_contacted)" />
                   Last contact: {{ formatDate(person.last_contacted) }}
@@ -167,7 +171,8 @@ const filteredPeople = computed(() => {
     filtered = filtered.filter(person => 
       person.name.toLowerCase().includes(query) ||
       (person.name_ext && person.name_ext.toLowerCase().includes(query)) ||
-      (person.location && person.location.toLowerCase().includes(query))
+      (person.location && person.location.toLowerCase().includes(query)) ||
+      (person.company && person.company.toLowerCase().includes(query))
     )
   }
 

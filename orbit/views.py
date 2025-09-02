@@ -300,6 +300,22 @@ def dashboard_analytics(request):
     })
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def location_suggestions(request):
+    """Get unique location suggestions for auto-complete"""
+    locations = Person.objects.exclude(location='').values_list('location', flat=True).distinct()
+    return Response({'locations': sorted(set(locations))})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def company_suggestions(request):
+    """Get unique company suggestions for auto-complete"""
+    companies = Person.objects.exclude(company='').values_list('company', flat=True).distinct()
+    return Response({'companies': sorted(set(companies))})
+
+
 # Frontend view
 def index_view(request):
     """Serve the Vue.js frontend"""
