@@ -36,7 +36,7 @@
                 <q-btn 
                   color="secondary"
                   icon="contact_phone" 
-                  :to="{ name: 'contact-attempt-create' }"
+                  :to="{ name: 'ping-create' }"
                   :label="$q.screen.gt.xs ? 'New Ping' : undefined"
                 >
                   <q-tooltip v-if="!$q.screen.gt.xs">New Ping</q-tooltip>

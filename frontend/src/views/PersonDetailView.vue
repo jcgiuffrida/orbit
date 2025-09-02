@@ -457,7 +457,7 @@ const addConversation = () => {
 const addContactAttempt = () => {
   if (person.value) {
     router.push({ 
-      name: 'contact-attempt-create', 
+      name: 'ping-create', 
       query: { person: person.value.id } 
     })
   }

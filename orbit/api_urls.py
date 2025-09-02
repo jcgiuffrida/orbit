@@ -9,7 +9,7 @@ from .views import (
 router = DefaultRouter()
 router.register('people', PersonViewSet, basename='person')
 router.register('conversations', ConversationViewSet, basename='conversation')
-router.register('contact-attempts', ContactAttemptViewSet, basename='contactattempt')
+router.register('pings', ContactAttemptViewSet, basename='contactattempt')
 router.register('relationships', RelationshipViewSet, basename='relationship')
 
 urlpatterns = [

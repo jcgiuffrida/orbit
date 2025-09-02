@@ -7,7 +7,7 @@ A personal family app for tracking people and conversations in a social orbit. (
 Orbit helps maintain meaningful connections by tracking:
 - **People**: Contact info, birthdays, how you met, and AI-generated summaries
 - **Conversations**: Notes from interactions, including group conversations
-- **Contact Attempts**: Log when you reach out via text, email, calls, etc.
+- **Pings (Contact Attempts)**: Log when you reach out via text, email, calls, etc.
 - **Relationships**: Map connections between people in your network
 
 ## Models

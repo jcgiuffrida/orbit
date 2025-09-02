@@ -197,7 +197,7 @@ class ContactAttemptAPITest(APITestCase):
             date=date.today() - timedelta(days=1),
             type='text',
             notes='Sent hello message',
-            led_to_conversation=self.conversation,
+            led_to_conversation=True,
             created_by=self.user
         )
 

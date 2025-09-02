@@ -9,7 +9,7 @@
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center q-pa-xl">
           <q-spinner-dots size="50px" color="primary" />
-          <div class="q-mt-md">{{ isEditing ? 'Loading contact attempt details...' : 'Loading...' }}</div>
+          <div class="q-mt-md">{{ isEditing ? 'Loading ping details...' : 'Loading...' }}</div>
         </div>
 
         <!-- Error State -->
@@ -31,14 +31,14 @@
           <!-- Breadcrumb Navigation -->
           <div class="breadcrumb-nav q-mb-md">
             <q-breadcrumbs class="text-grey-6">
-              <q-breadcrumbs-el icon="contact_phone" label="Contact Attempts" @click="goToContactAttempts" class="cursor-pointer" />
+              <q-breadcrumbs-el icon="contact_phone" label="Pings" @click="goToContactAttempts" class="cursor-pointer" />
               <q-breadcrumbs-el 
                 v-if="isEditing && originalContactAttempt" 
-                :label="`${originalContactAttempt.person_name || 'Contact Attempt'}`" 
-                @click="goToDetail" 
+                :label="`${originalContactAttempt.person_name || 'Ping'}`" 
+                @click="goToPerson" 
                 class="cursor-pointer" 
               />
-              <q-breadcrumbs-el :label="isEditing ? 'Edit' : 'Add Contact Attempt'" />
+              <q-breadcrumbs-el :label="isEditing ? 'Edit' : 'Add Ping'" />
             </q-breadcrumbs>
           </div>
 
@@ -48,7 +48,7 @@
                 <!-- Main Information Card -->
                 <q-card>
                   <q-card-section>
-                    <div class="text-h6 q-mb-md">Contact Attempt Details</div>
+                    <div class="text-h6 q-mb-md">Ping Details</div>
                     
                     <!-- Person -->
                     <q-select
@@ -159,11 +159,11 @@
                     
                     <q-checkbox
                       v-model="form.private"
-                      label="Private contact attempt"
+                      label="Private ping"
                       color="orange"
                     />
                     <div class="text-caption text-grey-6 q-ml-lg">
-                      Private contact attempts are only visible to you
+                      Private pings are only visible to you
                     </div>
                   </q-card-section>
                 </q-card>
@@ -178,7 +178,7 @@
                   />
                   <q-btn 
                     type="submit" 
-                    :label="isEditing ? 'Save Changes' : 'Add Contact Attempt'"
+                    :label="isEditing ? 'Save Changes' : 'Add Ping'"
                     color="primary"
                     :loading="isSaving"
                   />
@@ -306,7 +306,8 @@ const saveContactAttempt = async () => {
       date: form.date,
       type: form.type,
       notes: form.notes || '',
-      private: form.private
+      led_to_conversation: form.ledToConversation,
+      private: form.private,
     }
     
     if (isEditing.value) {
@@ -315,14 +316,14 @@ const saveContactAttempt = async () => {
       
       $q.notify({
         type: 'positive',
-        message: 'Contact attempt updated successfully',
+        message: 'Ping updated successfully',
         position: 'top',
         timeout: 3000,
         actions: [{ icon: 'close', color: 'white', dense: true }]
       })
       
       // Navigate to contact attempts list
-      router.push({ name: 'contact-attempts' })
+      router.push({ name: 'pings' })
     } else {
       // Create new contact attempt
       const newContactAttempt = await contactAttemptsStore.createContactAttempt(contactAttemptData)
@@ -341,7 +342,7 @@ const saveContactAttempt = async () => {
             handler: () => {
               // Reset form to add another ping
               resetForm()
-              router.push({ name: 'contact-attempt-create' })
+              router.push({ name: 'ping-create' })
             }
           },
           { icon: 'close', color: 'white', dense: true }
@@ -352,7 +353,7 @@ const saveContactAttempt = async () => {
       if (form.ledToConversation) {
         $q.dialog({
           title: 'Create Conversation',
-          message: 'Would you like to create a conversation record based on this contact attempt?',
+          message: 'Would you like to record a conversation from this ping?',
           cancel: true,
           persistent: false
         }).onOk(() => {
@@ -366,18 +367,18 @@ const saveContactAttempt = async () => {
             }
           })
         }).onCancel(() => {
-          router.push({ name: 'contact-attempts' })
+          router.push({ name: 'pings' })
         })
       } else {
         // Navigate to contact attempts list
-        router.push({ name: 'contact-attempts' })
+        router.push({ name: 'pings' })
       }
     }
   } catch (err) {
     console.error('Failed to save contact attempt:', err)
     $q.notify({
       type: 'negative',
-      message: `Failed to ${isEditing.value ? 'update' : 'create'} contact attempt. Please try again.`,
+      message: `Failed to ${isEditing.value ? 'update' : 'create'} ping. Please try again.`,
       position: 'top',
       timeout: 4000
     })
@@ -387,16 +388,16 @@ const saveContactAttempt = async () => {
 }
 
 const cancelEdit = () => {
-  router.push({ name: 'contact-attempts' })
+  router.push({ name: 'pings' })
 }
 
 const goToContactAttempts = () => {
-  router.push({ name: 'contact-attempts' })
+  router.push({ name: 'pings' })
 }
 
-const goToDetail = () => {
+const goToPerson = () => {
   if (isEditing.value && originalContactAttempt.value) {
-    router.push({ name: 'contact-attempt-detail', params: { id: originalContactAttempt.value.id } })
+    router.push({ name: 'person-detail', params: { id: originalContactAttempt.value.person } })
   }
 }
 

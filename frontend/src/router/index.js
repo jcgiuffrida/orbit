@@ -58,20 +58,20 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/contact-attempts',
-      name: 'contact-attempts',
+      path: '/pings',
+      name: 'pings',
       component: () => import('@/views/ContactAttemptsView.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/contact-attempts/new',
-      name: 'contact-attempt-create',
+      path: '/pings/new',
+      name: 'ping-create',
       component: () => import('@/views/ContactAttemptCreateView.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/contact-attempts/:id/edit',
-      name: 'contact-attempt-edit',
+      path: '/pings/:id/edit',
+      name: 'ping-edit',
       component: () => import('@/views/ContactAttemptCreateView.vue'),
       meta: { requiresAuth: true }
     },

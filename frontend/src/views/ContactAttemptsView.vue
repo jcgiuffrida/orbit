@@ -8,7 +8,10 @@
       <q-page class="q-pa-md" style="background-color: #f8f9fa;">
         <!-- Header -->
         <div class="row items-center q-mb-lg">
-          <div class="text-h4 col">Pings</div>
+          <div class="col">
+            <div class="text-h4">Pings</div>
+            <div class="text-subtitle1 text-grey-7">Pings are contact attempts, like emails or text messages, that try to lead to conversations.</div>
+          </div>
           <q-btn 
             color="primary" 
             icon="add" 
@@ -81,7 +84,7 @@
           <q-btn 
             v-if="!searchQuery && !filterType"
             color="primary" 
-            label="Add Your First Contact Attempt" 
+            label="Add Your First Ping" 
             class="q-mt-md"
             @click="addContactAttempt"
           />
@@ -260,11 +263,11 @@ const loadContactAttempts = async () => {
 }
 
 const addContactAttempt = () => {
-  router.push({ name: 'contact-attempt-create' })
+  router.push({ name: 'ping-create' })
 }
 
 const editContactAttempt = (attempt) => {
-  router.push({ name: 'contact-attempt-edit', params: { id: attempt.id } })
+  router.push({ name: 'ping-edit', params: { id: attempt.id } })
 }
 
 const addConversation = (attempt) => {
@@ -280,8 +283,8 @@ const addConversation = (attempt) => {
 
 const deleteContactAttempt = async (attempt) => {
   $q.dialog({
-    title: 'Delete Contact Attempt',
-    message: `Are you sure you want to delete this contact attempt with ${attempt.person_name}?`,
+    title: 'Delete Ping',
+    message: `Are you sure you want to delete this ping with ${attempt.person_name}?`,
     cancel: true,
     persistent: true
   }).onOk(async () => {
@@ -289,15 +292,15 @@ const deleteContactAttempt = async (attempt) => {
       await contactAttemptsStore.deleteContactAttempt(attempt.id)
       $q.notify({
         type: 'positive',
-        message: 'Contact attempt deleted successfully',
+        message: 'Ping deleted successfully',
         position: 'top',
         timeout: 3000
       })
     } catch (error) {
-      console.error('Failed to delete contact attempt:', error)
+      console.error('Failed to delete ping:', error)
       $q.notify({
         type: 'negative',
-        message: 'Failed to delete contact attempt. Please try again.',
+        message: 'Failed to delete ping. Please try again.',
         position: 'top',
         timeout: 4000
       })

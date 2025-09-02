@@ -123,7 +123,7 @@ class ContactAttemptModelTest(TestCase):
             date=date.today() - timedelta(days=1),
             type="text",
             notes="Sent a quick hello",
-            led_to_conversation=self.conversation
+            led_to_conversation=True
         )
 
     def test_contact_attempt_creation(self):
@@ -131,7 +131,7 @@ class ContactAttemptModelTest(TestCase):
         self.assertEqual(self.contact_attempt.date, date.today() - timedelta(days=1))
         self.assertEqual(self.contact_attempt.type, "text")
         self.assertEqual(self.contact_attempt.notes, "Sent a quick hello")
-        self.assertEqual(self.contact_attempt.led_to_conversation, self.conversation)
+        self.assertEqual(self.contact_attempt.led_to_conversation, True)
         self.assertTrue(self.contact_attempt.created_at)
 
     def test_contact_attempt_str(self):
@@ -145,7 +145,7 @@ class ContactAttemptModelTest(TestCase):
             type="email",
             notes="No response"
         )
-        self.assertIsNone(attempt.led_to_conversation)
+        self.assertEqual(attempt.led_to_conversation, False)
 
     def test_contact_attempt_ordering(self):
         # Create newer attempt

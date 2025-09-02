@@ -72,7 +72,7 @@ class ContactAttempt(models.Model):
     date = models.DateField()
     type = models.CharField(choices=ATTEMPT_TYPES)
     notes = models.TextField(blank=True)
-    led_to_conversation = models.ForeignKey(Conversation, on_delete=models.SET_NULL, blank=True, null=True)
+    led_to_conversation = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='created_contact_attempts')
     created_at = models.DateTimeField(auto_now_add=True)

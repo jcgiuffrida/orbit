@@ -2,32 +2,32 @@ import api from './api'
 
 export const contactAttemptsService = {
   async fetchContactAttempts() {
-    const response = await api.get('/contact-attempts/')
+    const response = await api.get('/pings/')
     return response.data.results
   },
 
   async fetchContactAttemptsForPerson(personId) {
-    const response = await api.get(`/contact-attempts/?person=${personId}`)
+    const response = await api.get(`/pings/?person=${personId}`)
     return response.data.results
   },
 
   async fetchContactAttemptById(id) {
-    const response = await api.get(`/contact-attempts/${id}/`)
+    const response = await api.get(`/pings/${id}/`)
     return response.data
   },
 
   async createContactAttempt(contactAttemptData) {
-    const response = await api.post('/contact-attempts/', contactAttemptData)
+    const response = await api.post('/pings/', contactAttemptData)
     return response.data
   },
 
   async updateContactAttempt(id, contactAttemptData) {
-    const response = await api.put(`/contact-attempts/${id}/`, contactAttemptData)
+    const response = await api.put(`/pings/${id}/`, contactAttemptData)
     return response.data
   },
 
   async deleteContactAttempt(id) {
-    await api.delete(`/contact-attempts/${id}/`)
+    await api.delete(`/pings/${id}/`)
   }
 }
 
