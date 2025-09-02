@@ -53,22 +53,32 @@
                     <!-- Participants -->
                     <q-select
                       v-model="form.participants"
-                      :options="peopleOptions"
+                      :options="filteredPeopleOptions"
                       label="Participants *"
                       filled
                       multiple
                       required
                       option-value="id"
-                      option-label="name"
                       emit-value
                       map-options
                       use-chips
                       stack-label
+                      use-input
+                      input-debounce="0"
                       autocomplete="off"
                       class="q-mb-md"
                       :rules="[val => (val && val.length > 0) || 'At least one participant is required']"
                       @popup-show="ensurePeopleLoaded"
+                      @filter="filterPeople"
                     >
+                      <template v-slot:option="scope">
+                        <q-item v-bind="scope.itemProps">
+                          <q-item-section>
+                            <q-item-label>{{ scope.opt.name }}</q-item-label>
+                            <q-item-label v-if="scope.opt.name_ext" caption>{{ scope.opt.name_ext }}</q-item-label>
+                          </q-item-section>
+                        </q-item>
+                      </template>
                       <template v-slot:selected-item="scope">
                         <q-chip
                           removable
@@ -77,6 +87,7 @@
                           class="q-ma-xs"
                         >
                           {{ scope.opt.name }}
+                          <span v-if="scope.opt.name_ext" class="text-caption q-ml-xs">({{ scope.opt.name_ext }})</span>
                         </q-chip>
                       </template>
                     </q-select>
@@ -251,6 +262,9 @@ const form = reactive({
 const allConversationLocationOptions = ref([])
 const conversationLocationOptions = ref([])
 
+// Filtered people options for participant search
+const filteredPeopleOptions = ref([])
+
 const resetForm = () => {
   form.participants = []
   form.date = new Date().toISOString().split('T')[0]
@@ -284,6 +298,8 @@ const ensurePeopleLoaded = async () => {
       console.error('Failed to load people:', err)
     }
   }
+  // Initialize filtered options with all people
+  filteredPeopleOptions.value = [...peopleStore.getPeopleList]
 }
 
 const loadData = async () => {
@@ -433,6 +449,21 @@ const filterConversationLocations = (val, update) => {
   })
 }
 
+// Filter people based on search input
+const filterPeople = (val, update) => {
+  update(() => {
+    if (val === '') {
+      filteredPeopleOptions.value = [...peopleStore.getPeopleList]
+    } else {
+      const needle = val.toLowerCase()
+      filteredPeopleOptions.value = peopleStore.getPeopleList.filter(person => 
+        person.name.toLowerCase().includes(needle) ||
+        (person.name_ext && person.name_ext.toLowerCase().includes(needle))
+      )
+    }
+  })
+}
+
 // Watch for route parameter changes
 watch(() => route.params.id, (newId, oldId) => {
   if (newId && newId !== oldId) {
@@ -444,6 +475,11 @@ onMounted(() => {
   loadData()
   loadConversationLocationSuggestions()
 })
+
+// Initialize filtered people options when people data changes
+watch(() => peopleStore.getPeopleList, (newPeople) => {
+  filteredPeopleOptions.value = [...newPeople]
+}, { immediate: true })
 </script>
 
 <style scoped>

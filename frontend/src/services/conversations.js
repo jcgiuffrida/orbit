@@ -1,9 +1,9 @@
 import api from './api'
 
 export const conversationsService = {
-  async fetchConversations() {
-    const response = await api.get('/conversations/')
-    return response.data.results
+  async fetchConversations(params = {}) {
+    const response = await api.get('/conversations/', { params })
+    return response.data
   },
 
   async fetchConversationsForPerson(personId) {

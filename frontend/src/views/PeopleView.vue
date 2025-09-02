@@ -132,6 +132,16 @@
           </div>
         </div>
 
+        <!-- Results Info -->
+        <div v-if="peopleStore.people.length > 0" class="row items-center justify-center q-mt-lg">
+          <div class="text-body2 text-grey-6">
+            Showing {{ filteredPeople.length }} of {{ peopleStore.people.length }} people
+            <span v-if="peopleStore.pagination.count && peopleStore.pagination.count !== peopleStore.people.length">
+              ({{ peopleStore.people.length }} of {{ peopleStore.pagination.count }} total loaded)
+            </span>
+          </div>
+        </div>
+
       </q-page>
     </q-page-container>
   </q-layout>
@@ -211,6 +221,7 @@ const loadPeople = async () => {
     console.error('Error loading people:', error)
   }
 }
+
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Never'

@@ -9,6 +9,14 @@ export const usePeopleStore = defineStore('people', () => {
   const error = ref(null)
   const lastFetch = ref(null)
   const selectedPerson = ref(null)
+  const pagination = ref({
+    count: 0,
+    next: null,
+    previous: null,
+    currentPage: 1,
+    totalPages: 1,
+    hasMore: false
+  })
 
   // Cache configuration
   const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
@@ -45,8 +53,8 @@ export const usePeopleStore = defineStore('people', () => {
     loading.value = false
   }
 
-  // Fetch all people (with caching)
-  const fetchPeople = async (force = false) => {
+  // Fetch all people (with caching and pagination)
+  const fetchPeople = async (force = false, params = {}) => {
     // If cache is valid and not forced, return cached data
     if (!force && isCacheValid.value && people.value.length > 0) {
       return people.value
@@ -56,13 +64,110 @@ export const usePeopleStore = defineStore('people', () => {
     clearError()
 
     try {
-      const response = await peopleService.getAll()
-      people.value = response.results || response
+      // First, get the first page
+      const response = await peopleService.getAll(params)
+      
+      if (response.results) {
+        let allPeople = [...response.results]
+        
+        // Update pagination info
+        pagination.value = {
+          count: response.count,
+          next: response.next,
+          previous: response.previous,
+          currentPage: params.page || 1,
+          totalPages: Math.ceil(response.count / (response.results.length || 50)),
+          hasMore: !!response.next
+        }
+        
+        // If there are more pages, fetch them all automatically
+        let nextUrl = response.next
+        while (nextUrl) {
+          try {
+            const nextUrlObj = new URL(nextUrl)
+            const nextPage = nextUrlObj.searchParams.get('page')
+            const nextResponse = await peopleService.getAll({ ...params, page: nextPage })
+            
+            if (nextResponse.results) {
+              allPeople = [...allPeople, ...nextResponse.results]
+              nextUrl = nextResponse.next
+              
+              // Update pagination to reflect we've loaded more
+              pagination.value = {
+                ...pagination.value,
+                next: nextResponse.next,
+                currentPage: parseInt(nextPage),
+                hasMore: !!nextResponse.next
+              }
+            } else {
+              break
+            }
+          } catch (pageErr) {
+            console.error('Error fetching additional page:', pageErr)
+            break
+          }
+        }
+        
+        people.value = allPeople
+        pagination.value.hasMore = false // We've loaded everything
+      } else {
+        // Handle non-paginated response (fallback)
+        people.value = response
+        pagination.value = {
+          count: response.length,
+          next: null,
+          previous: null,
+          currentPage: 1,
+          totalPages: 1,
+          hasMore: false
+        }
+      }
+      
       lastFetch.value = new Date().getTime()
       return people.value
     } catch (err) {
       console.error('Error fetching people:', err)
       setError(err.response?.data?.message || 'Failed to load people')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Load more people (pagination)
+  const loadMorePeople = async () => {
+    if (!pagination.value.hasMore || loading.value) {
+      return
+    }
+
+    setLoading(true)
+    clearError()
+
+    try {
+      // Extract page number from next URL
+      const nextUrl = new URL(pagination.value.next)
+      const nextPage = nextUrl.searchParams.get('page')
+      
+      const response = await peopleService.getAll({ page: nextPage })
+      
+      if (response.results) {
+        // Append new results to existing people
+        people.value = [...people.value, ...response.results]
+        pagination.value = {
+          count: response.count,
+          next: response.next,
+          previous: response.previous,
+          currentPage: parseInt(nextPage),
+          totalPages: Math.ceil(response.count / (response.results.length || 50)),
+          hasMore: !!response.next
+        }
+      }
+      
+      lastFetch.value = new Date().getTime()
+      return people.value
+    } catch (err) {
+      console.error('Error loading more people:', err)
+      setError(err.response?.data?.message || 'Failed to load more people')
       throw err
     } finally {
       setLoading(false)
@@ -225,6 +330,14 @@ export const usePeopleStore = defineStore('people', () => {
     error.value = null
     loading.value = false
     lastFetch.value = null
+    pagination.value = {
+      count: 0,
+      next: null,
+      previous: null,
+      currentPage: 1,
+      totalPages: 1,
+      hasMore: false
+    }
   }
 
   return {
@@ -233,6 +346,7 @@ export const usePeopleStore = defineStore('people', () => {
     loading,
     error,
     selectedPerson,
+    pagination,
     
     // Getters
     isLoading,
@@ -245,6 +359,7 @@ export const usePeopleStore = defineStore('people', () => {
     // Actions
     clearError,
     fetchPeople,
+    loadMorePeople,
     fetchPersonById,
     createPerson,
     updatePerson,

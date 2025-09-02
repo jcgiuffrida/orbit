@@ -266,7 +266,7 @@
                             <span v-if="conversation.location"> • {{ conversation.location }}</span>
                           </div>
                           <div class="text-caption text-grey-6 q-mb-xs">
-                            {{ formatConversationDate(conversation.date) }}
+                            {{ formatDateLong(conversation.date) }}
                           </div>
                           <div class="text-body2 text-grey-7 conversation-preview">
                             {{ truncateText(conversation.notes, 150) }}
@@ -314,6 +314,7 @@ import { useQuasar } from 'quasar'
 import { usePeopleStore } from '@/stores/people'
 import { useConversationsStore } from '@/stores/conversations'
 import { getConversationTypeIcon, getConversationTypeLabel, getConversationTypeColor } from '@/services/conversations'
+import { formatDateLong } from '@/utils/dateFormatting'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import PersonRelationships from '@/components/PersonRelationships.vue'
@@ -526,8 +527,8 @@ const getLastContactColor = (dateString) => {
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
   
   if (diffDays <= 60) return 'positive'      // Past 2 months
-  if (diffDays <= 180) return 'grey-7'      // Past 6 months (neutral)
-  return 'negative'                          // Older than 6 months
+  if (diffDays <= 365) return 'grey-7'      // Past 12 months (neutral)
+  return 'negative'                          // Older than 12 months
 }
 
 const getLastContactTextClass = (dateString) => {
@@ -539,8 +540,8 @@ const getLastContactTextClass = (dateString) => {
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
   
   if (diffDays <= 60) return 'text-positive'    // Past 2 months
-  if (diffDays <= 180) return 'text-grey-8'     // Past 6 months (neutral)
-  return 'text-negative'                         // Older than 6 months
+  if (diffDays <= 365) return 'text-grey-8'     // Past 12 months (neutral)
+  return 'text-negative'                         // Older than 12 months
 }
 
 

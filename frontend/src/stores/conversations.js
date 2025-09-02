@@ -48,10 +48,40 @@ export const useConversationsStore = defineStore('conversations', () => {
     clearError()
 
     try {
-      const data = await conversationsService.fetchConversations()
-      conversations.value = data
+      // First, get the first page
+      const response = await conversationsService.fetchConversations()
+      
+      if (response.results) {
+        let allConversations = [...response.results]
+        
+        // If there are more pages, fetch them all automatically
+        let nextUrl = response.next
+        while (nextUrl) {
+          try {
+            const nextUrlObj = new URL(nextUrl)
+            const nextPage = nextUrlObj.searchParams.get('page')
+            const nextResponse = await conversationsService.fetchConversations({ page: nextPage })
+            
+            if (nextResponse.results) {
+              allConversations = [...allConversations, ...nextResponse.results]
+              nextUrl = nextResponse.next
+            } else {
+              break
+            }
+          } catch (pageErr) {
+            console.error('Error fetching additional conversation page:', pageErr)
+            break
+          }
+        }
+        
+        conversations.value = allConversations
+      } else {
+        // Handle non-paginated response (fallback)
+        conversations.value = response
+      }
+      
       lastFetched.value = Date.now()
-      return data
+      return conversations.value
     } catch (err) {
       console.error('Failed to fetch conversations:', err)
       setError('Failed to load conversations')

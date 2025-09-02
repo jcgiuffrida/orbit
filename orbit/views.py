@@ -258,7 +258,7 @@ def dashboard_analytics(request):
         conversations__isnull=False
     ).annotate(
         total_conversations=Count('conversations', filter=
-            Q(conversations__private=False) | Q(conversations__created_by=request.user)
+            (Q(conversations__private=False) | Q(conversations__created_by=request.user)) & Q(conversations__date__gte=two_years_ago)
         ),
         recent_conversations=Count('conversations', filter=
             Q(conversations__date__gte=six_months_ago) &
