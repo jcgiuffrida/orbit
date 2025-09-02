@@ -31,7 +31,6 @@ export default defineConfig({
     }
   },
   build: {
-    base: '/static/',
     outDir: 'dist',
     assetsDir: 'assets',
     manifest: true,
