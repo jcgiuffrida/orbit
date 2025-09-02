@@ -48,7 +48,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 403 && error.response?.data?.detail === 'Authentication credentials were not provided.') {
       // Redirect to login or handle auth error
-      console.log('Authentication required')
+      console.error('Authentication required')
     }
     return Promise.reject(error)
   }

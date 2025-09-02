@@ -43,13 +43,9 @@ class ConversationViewSet(viewsets.ModelViewSet):
         # Filter by participant if provided
         participant_id = self.request.query_params.get('participant', None)
         if participant_id:
-            print(f"Filtering conversations for participant: {participant_id}")
             try:
                 queryset = queryset.filter(participants__id=participant_id)
-                count = queryset.count()
-                print(f"Found {count} conversations for participant {participant_id}")
             except (ValueError, TypeError) as e:
-                print(f"Error filtering by participant {participant_id}: {e}")
                 # Return empty queryset if participant_id is invalid
                 return Conversation.objects.none()
         

@@ -13,10 +13,7 @@ export const conversationsService = {
     }
     
     const response = await api.get(`/conversations/?participant=${personId}`)
-    const results = response.data.results || response.data || []
-    
-    console.log(`Fetched ${results.length} conversations for person ${personId}`)
-    return results
+    return response.data.results || response.data || []
   },
 
   async fetchConversationById(id) {
