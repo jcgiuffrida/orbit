@@ -219,7 +219,7 @@
                       class="q-mb-md"
                     />
                     
-                    <q-input
+                    <!-- <q-input
                       v-model="form.ai_summary"
                       label="AI Summary"
                       type="textarea"
@@ -228,7 +228,7 @@
                       autocomplete="off"
                       class="q-mb-md"
                       hint="AI-generated summary of conversations and interactions"
-                    />
+                    /> -->
                   </q-card-section>
                 </q-card>
 
