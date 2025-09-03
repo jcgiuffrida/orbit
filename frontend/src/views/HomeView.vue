@@ -204,7 +204,7 @@
                               <span v-if="birthday.is_today" class="text-weight-bold">Today!</span>
                               <span v-else-if="birthday.days_until === 1">Tomorrow</span>
                               <span v-else>{{ birthday.days_until }} days</span>
-                              <span v-if="birthday.age" class="q-ml-sm">({{ birthday.age }})</span>
+                              <span v-if="birthday.age" class="q-ml-sm">({{ birthday.age + 1 * !birthday.is_today }})</span>
                             </div>
                           </div>
                         </div>
@@ -218,10 +218,10 @@
 
           <!-- People to Reach Out -->
           <div class="row">
-            <div class="col-12">
+            <div class="col-12 q-mb-lg">
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">People to Reach Out</div>
+                  <div class="text-h6">People to Ping</div>
                 </q-card-section>
                 <q-card-section v-if="dashboardData.people_to_reach_out.length === 0">
                   <div class="text-body2 text-grey-6">Great! You're up to date with everyone.</div>

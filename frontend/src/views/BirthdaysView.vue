@@ -105,7 +105,7 @@
                                   <div class="text-h6">{{ birthday.name }}</div>
                                   <div class="text-subtitle2 text-grey-6">
                                     {{ birthday.birthday_display }}
-                                    <span v-if="birthday.age" class="q-ml-sm">(turning {{ birthday.age }})</span>
+                                    <span v-if="birthday.age" class="q-ml-sm">(turning {{ birthday.age + 1 * !birthday.is_today }})</span>
                                   </div>
                                   <div v-if="birthday.name_ext" class="text-caption text-grey-6">
                                     {{ birthday.name_ext }}
