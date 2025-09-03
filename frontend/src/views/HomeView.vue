@@ -72,23 +72,23 @@
             <div class="col-12">
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">Activity Overview</div>
+                  <div class="text-h6">Conversations Overview</div>
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-col-gutter-md">
                     <div class="col">
                       <div class="text-caption">Past Week</div>
-                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.week }} conversations</div>
+                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.week }} <span class="gt-sm">conversations</span></div>
                       <div v-if="dashboardData.activity_overview.contact_attempts.week > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.week }} pings</div>
                     </div>
                     <div class="col">
                       <div class="text-caption">Past Month</div>
-                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.month }} conversations</div>
+                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.month }} <span class="gt-sm">conversations</span></div>
                       <div v-if="dashboardData.activity_overview.contact_attempts.month > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.month }} pings</div>
                     </div>
                     <div class="col">
                       <div class="text-caption">Past Year</div>
-                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.year }} conversations</div>
+                      <div class="text-h6">{{ dashboardData.activity_overview.conversations.year }} <span class="gt-sm">conversations</span></div>
                       <div v-if="dashboardData.activity_overview.contact_attempts.year > 0" class="text-body2">+ {{ dashboardData.activity_overview.contact_attempts.year }} pings</div>
                     </div>
                   </div>
@@ -260,6 +260,9 @@ import api from '@/services/api'
 import AppHeader from '@/components/AppHeader.vue'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import ActivityChart from '@/components/ActivityChart.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const $q = useQuasar()
 

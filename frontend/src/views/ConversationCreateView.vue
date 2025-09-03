@@ -57,7 +57,6 @@
                       label="Participants *"
                       filled
                       multiple
-                      required
                       option-value="id"
                       emit-value
                       map-options
