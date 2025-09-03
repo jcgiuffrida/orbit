@@ -37,7 +37,7 @@ class PersonModelTest(TestCase):
         self.assertEqual(str(person), "Simple Name")
 
     def test_person_last_contacted_no_conversations(self):
-        self.assertIsNone(self.person.last_contacted)
+        self.assertIsNone(self.person.last_contacted_date)
 
     def test_person_last_contacted_with_conversations(self):
         # Create a conversation
@@ -48,7 +48,7 @@ class PersonModelTest(TestCase):
         )
         conversation.participants.add(self.person)
         
-        self.assertEqual(self.person.last_contacted, date.today() - timedelta(days=5))
+        self.assertEqual(self.person.last_contacted_date, date.today() - timedelta(days=5))
 
     def test_person_blank_fields(self):
         person = Person.objects.create(name="Minimal Person")

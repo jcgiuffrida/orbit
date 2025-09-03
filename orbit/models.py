@@ -27,7 +27,7 @@ class Person(models.Model):
         return self.name
     
     @property
-    def last_contacted(self):
+    def last_contacted_date(self):
         last_conversation = self.conversations.order_by('-date').first()
         return last_conversation.date if last_conversation else None
     

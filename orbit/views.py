@@ -8,7 +8,7 @@ from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Max
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .models import Person, Conversation, ContactAttempt, Relationship
@@ -24,7 +24,7 @@ class PersonViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         # People are shared across all family members
-        return Person.objects.all().order_by('name')
+        return Person.objects.all().select_related('created_by').annotate(last_contacted=Max('conversations__date')).order_by('name')
     
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -38,7 +38,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
         # Include public conversations (private=False) and private conversations created by current user
         queryset = Conversation.objects.filter(
             Q(private=False) | Q(private=True, created_by=self.request.user)
-        )
+        ).prefetch_related('participants').select_related('created_by')
         
         # Filter by participant if provided
         participant_id = self.request.query_params.get('participant', None)
@@ -63,7 +63,7 @@ class ContactAttemptViewSet(viewsets.ModelViewSet):
         # Include public contact attempts (private=False) and private attempts created by current user
         return ContactAttempt.objects.filter(
             Q(private=False) | Q(private=True, created_by=self.request.user)
-        ).order_by('-date')
+        ).select_related('person', 'created_by').order_by('-date')
     
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -75,7 +75,9 @@ class RelationshipViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         # Relationships are shared across all family members
-        return Relationship.objects.all().order_by('person1__name')
+        return Relationship.objects.select_related(
+            'person1', 'person2', 'created_by',    
+        ).order_by('person1__name')
     
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -162,7 +164,7 @@ def get_upcoming_birthdays(days_ahead=30):
     people_with_birthdays = Person.objects.filter(
         birthday_month__isnull=False,
         birthday_day__isnull=False
-    ).select_related()
+    ).select_related('created_by')
     
     for person in people_with_birthdays:
         # Calculate next birthday occurrence
@@ -209,47 +211,47 @@ def dashboard_analytics(request):
     # Recent conversations (last 10, within past year)
     recent_conversations = Conversation.objects.filter(
         Q(date__gte=year_ago) &
-        (Q(private=False) | Q(private=True, created_by=request.user))
-    ).order_by('-date')[:10]
+        (Q(private=False) | Q(created_by=request.user))
+    ).prefetch_related('participants').order_by('-date')[:10]
     
     # Top contacts by conversation count in past 1-2 years
     top_contacts = Person.objects.annotate(
         recent_conversation_count=Count(
             'conversations',
             filter=Q(conversations__date__gte=two_years_ago) &
-                   (Q(conversations__private=False) | Q(conversations__private=True, conversations__created_by=request.user))
+                   (Q(conversations__private=False) | Q(conversations__created_by=request.user))
         )
     ).filter(recent_conversation_count__gt=0).order_by('-recent_conversation_count')[:10]
     
     # Activity counts
     conversations_week = Conversation.objects.filter(
         Q(date__gte=week_ago) &
-        (Q(private=False) | Q(private=True, created_by=request.user))
+        (Q(private=False) | Q(created_by=request.user))
     ).count()
     
     conversations_month = Conversation.objects.filter(
         Q(date__gte=month_ago) &
-        (Q(private=False) | Q(private=True, created_by=request.user))
+        (Q(private=False) | Q(created_by=request.user))
     ).count()
     
     conversations_year = Conversation.objects.filter(
         Q(date__gte=year_ago) &
-        (Q(private=False) | Q(private=True, created_by=request.user))
+        (Q(private=False) | Q(created_by=request.user))
     ).count()
     
     contact_attempts_week = ContactAttempt.objects.filter(
         Q(date__gte=week_ago) &
-        (Q(private=False) | Q(private=True, created_by=request.user))
+        (Q(private=False) | Q(created_by=request.user))
     ).count()
     
     contact_attempts_month = ContactAttempt.objects.filter(
         Q(date__gte=month_ago) &
-        (Q(private=False) | Q(private=True, created_by=request.user))
+        (Q(private=False) | Q(created_by=request.user))
     ).count()
     
     contact_attempts_year = ContactAttempt.objects.filter(
         Q(date__gte=year_ago) &
-        (Q(private=False) | Q(private=True, created_by=request.user))
+        (Q(private=False) | Q(created_by=request.user))
     ).count()
     
     # People to reach out to (those with conversations but none recently)
@@ -323,7 +325,7 @@ def dashboard_analytics(request):
     # Upcoming birthdays in the next 30 days
     upcoming_birthdays = get_upcoming_birthdays(days_ahead=30)
     
-    return Response({
+    response = Response({
         'recent_conversations': ConversationSerializer(recent_conversations, many=True).data,
         'top_contacts': PersonSerializer(top_contacts, many=True).data,
         'activity_overview': {
@@ -342,6 +344,7 @@ def dashboard_analytics(request):
         'monthly_activity': monthly_data,
         'upcoming_birthdays': upcoming_birthdays
     })
+    return response
 
 
 @api_view(['GET'])

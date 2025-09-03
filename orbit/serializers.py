@@ -5,11 +5,16 @@ from datetime import datetime, timedelta
 from django.db.models import Count, Q
 
 
+class PersonThinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ['id', 'name', 'name_ext']
+        read_only_fields = ['id', 'name', 'name_ext']
+
+
 class PersonSerializer(serializers.ModelSerializer):
     last_contacted = serializers.DateField(read_only=True)
     created_by_username = serializers.ReadOnlyField(source='created_by.username')
-    conversation_count = serializers.SerializerMethodField()
-    conversation_count_recent = serializers.SerializerMethodField()
     days_since_last_contact = serializers.SerializerMethodField()
 
     class Meta:
@@ -18,33 +23,25 @@ class PersonSerializer(serializers.ModelSerializer):
             'id', 'name', 'name_ext', 'email', 'phone', 'location', 'address', 'company', 
             'birthday_month', 'birthday_day', 'birth_year', 'birthday', 'birthday_display', 'age',
             'how_we_met', 'notes', 'ai_summary', 'created_by_username', 
-            'created_at', 'last_contacted', 'conversation_count', 
-            'conversation_count_recent', 'days_since_last_contact'
+            'created_at', 'last_contacted', 
+            'days_since_last_contact'
         ]
         read_only_fields = [
             'created_at', 'last_contacted', 'created_by_username', 
-            'conversation_count', 'conversation_count_recent', 'days_since_last_contact',
+            'days_since_last_contact',
             'birthday', 'birthday_display', 'age'
         ]
 
-    def get_conversation_count(self, obj):
-        """Total conversation count"""
-        return obj.conversations.count()
-
-    def get_conversation_count_recent(self, obj):
-        """Conversation count in past 2 years"""
-        two_years_ago = timezone.now().date() - timedelta(days=365*2)
-        return obj.conversations.filter(date__gte=two_years_ago).count()
-
     def get_days_since_last_contact(self, obj):
         """Days since last conversation"""
+        obj.last_contacted = getattr(obj, 'last_contacted', obj.last_contacted_date)
         if obj.last_contacted:
             return (timezone.now().date() - obj.last_contacted).days
         return None
 
 
 class ConversationSerializer(serializers.ModelSerializer):
-    participants = PersonSerializer(many=True, read_only=True)
+    participants = PersonThinSerializer(many=True, read_only=True)
     participant_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Person.objects.all(),
