@@ -17,9 +17,9 @@
           />
         </div>
 
-        <!-- Search and Sorting -->
+        <!-- Search and Filtering -->
         <div class="row q-col-gutter-md q-mb-lg">
-          <div class="col-12 col-md-8">
+          <div class="col-12 col-md-6">
             <q-input
               v-model="searchQuery"
               filled
@@ -31,7 +31,22 @@
               </template>
             </q-input>
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-3">
+            <q-select
+              v-model="locationFilter"
+              filled
+              :options="locationFilterOptions"
+              label="Filter by Location"
+              clearable
+              emit-value
+              map-options
+            >
+              <template v-slot:prepend>
+                <q-icon name="place" />
+              </template>
+            </q-select>
+          </div>
+          <div class="col-12 col-md-3">
             <q-select
               v-model="sortBy"
               filled
@@ -162,6 +177,7 @@ const peopleStore = usePeopleStore()
 const leftDrawerOpen = ref(false)
 const searchQuery = ref('')
 const sortBy = ref('name')
+const locationFilter = ref('')
 
 // Options for sorting
 const sortOptions = [
@@ -170,6 +186,22 @@ const sortOptions = [
   { label: 'Recently Contacted', value: '-last_contacted' },
   { label: 'Least Recently Contacted', value: 'last_contacted' }
 ]
+
+// Options for location filtering
+const locationFilterOptions = computed(() => {
+  const locations = new Set()
+  peopleStore.people.forEach(person => {
+    if (person.location && person.location.trim()) {
+      locations.add(person.location.trim())
+    }
+  })
+  return Array.from(locations)
+    .sort()
+    .map(location => ({
+      label: location,
+      value: location
+    }))
+})
 
 // Computed
 const filteredPeople = computed(() => {
@@ -183,6 +215,13 @@ const filteredPeople = computed(() => {
       (person.name_ext && person.name_ext.toLowerCase().includes(query)) ||
       (person.location && person.location.toLowerCase().includes(query)) ||
       (person.company && person.company.toLowerCase().includes(query))
+    )
+  }
+
+  // Apply location filter
+  if (locationFilter.value) {
+    filtered = filtered.filter(person => 
+      person.location && person.location.trim() === locationFilter.value
     )
   }
 
