@@ -34,7 +34,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
     def get_days_since_last_contact(self, obj):
         """Days since last conversation"""
-        obj.last_contacted = getattr(obj, 'last_contacted', obj.last_contacted_date)
+        obj.last_contacted = getattr(obj, 'last_contacted') or obj.last_contacted_date
         if obj.last_contacted:
             return (timezone.now().date() - obj.last_contacted).days
         return None
