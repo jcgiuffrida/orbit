@@ -235,7 +235,12 @@
               <!-- Conversations -->
               <q-card class="content-card q-mb-lg" flat bordered>
                 <q-card-section class="q-pa-lg">
-                  <div class="text-h6 q-mb-md text-weight-medium">Conversations</div>
+                  <div class="text-h6 q-mb-md text-weight-medium">
+                    Conversations
+                    <span v-if="!loadingConversations && personConversations.length > 0" class="q-badge bg-grey-7 q-ml-sm">
+                      {{ personConversations.length }}
+                    </span>
+                  </div>
                   
                   <!-- Loading State -->
                   <div v-if="loadingConversations" class="text-center q-pa-md">
