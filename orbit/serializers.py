@@ -40,6 +40,23 @@ class PersonSerializer(serializers.ModelSerializer):
         return None
 
 
+class PersonDetailedSerializer(PersonSerializer):
+    recent_conversation_count = serializers.SerializerMethodField()
+
+    class Meta(PersonSerializer.Meta):
+        model = Person
+        fields = PersonSerializer.Meta.fields + [
+            'recent_conversation_count'
+        ]
+        read_only_fields = PersonSerializer.Meta.read_only_fields + [
+            'recent_conversation_count'
+        ]
+
+    def get_recent_conversation_count(self, obj):
+        return obj.recent_conversation_count
+
+
+
 class ConversationSerializer(serializers.ModelSerializer):
     participants = PersonThinSerializer(many=True, read_only=True)
     participant_ids = serializers.PrimaryKeyRelatedField(

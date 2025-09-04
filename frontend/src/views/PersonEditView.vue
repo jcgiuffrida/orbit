@@ -91,16 +91,6 @@
                       </template>
                     </q-select>
                     
-                    <q-input
-                      v-model="form.address"
-                      label="Address"
-                      type="textarea"
-                      filled
-                      autocomplete="off"
-                      class="q-mb-md"
-                      rows="3"
-                    />
-                    
                     <q-select
                       v-model="form.company"
                       label="Company"
@@ -146,6 +136,16 @@
                       autocomplete="off"
                       class="q-mb-md"
                     />
+
+                    <q-input
+                      v-model="form.address"
+                      label="Address"
+                      type="textarea"
+                      filled
+                      autocomplete="off"
+                      class="q-mb-md"
+                      rows="3"
+                    />
                     
                     <!-- Birthday Fields -->
                     <div class="text-subtitle2 q-mb-sm">Birthday</div>
@@ -181,7 +181,7 @@
                       <div class="col-3">
                         <q-input
                           v-model.number="form.birthYear"
-                          label="Year (optional)"
+                          label="Year"
                           type="number"
                           filled
                           clearable

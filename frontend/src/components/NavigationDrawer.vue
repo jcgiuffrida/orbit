@@ -1,5 +1,5 @@
 <template>
-  <q-drawer :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" show-if-above bordered class="bg-grey-1">
+  <q-drawer :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" show-if-above bordered class="bg-grey-1" width="250">
     <q-list>
       <q-item 
         v-for="item in navigationItems" 

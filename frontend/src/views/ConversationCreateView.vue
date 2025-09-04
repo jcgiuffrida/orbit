@@ -65,7 +65,6 @@
                       use-input
                       input-debounce="0"
                       autocomplete="off"
-                      class="q-mb-md"
                       :rules="[val => (val && val.length > 0) || 'At least one participant is required']"
                       @popup-show="ensurePeopleLoaded"
                       @filter="filterPeople"
@@ -91,55 +90,60 @@
                       </template>
                     </q-select>
                     
-                    <!-- Date -->
-                    <q-input
-                      v-model="form.date"
-                      label="Date *"
-                      type="date"
-                      filled
-                      required
-                      autocomplete="off"
-                      class="q-mb-md"
-                      :rules="[val => !!val || 'Date is required']"
-                    />
-                    
-                    <!-- Type -->
-                    <q-select
-                      v-model="form.type"
-                      :options="conversationTypes"
-                      label="Conversation Type *"
-                      filled
-                      required
-                      option-value="value"
-                      option-label="label"
-                      emit-value
-                      map-options
-                      autocomplete="off"
-                      class="q-mb-md"
-                      :rules="[val => !!val || 'Conversation type is required']"
-                    >
-                      <template v-slot:selected-item="scope">
-                        <q-item-section avatar v-if="scope.opt.icon">
-                          <q-icon :name="scope.opt.icon" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label>{{ scope.opt.label }}</q-item-label>
-                        </q-item-section>
-                      </template>
-                      <template v-slot:option="scope">
-                        <q-item v-bind="scope.itemProps">
+                    <div class="row q-col-gutter-sm">
+                      <div class="col-7 col-sm-6">
+                        <!-- Type -->
+                        <q-select
+                        v-model="form.type"
+                        :options="conversationTypes"
+                        label="Conversation Type *"
+                        filled
+                        required
+                        option-value="value"
+                        option-label="label"
+                        emit-value
+                        map-options
+                        autocomplete="off"
+                        :rules="[val => !!val || 'Conversation type is required']"
+                        >
+                        <template v-slot:selected-item="scope">
                           <q-item-section avatar v-if="scope.opt.icon">
                             <q-icon :name="scope.opt.icon" />
                           </q-item-section>
                           <q-item-section>
                             <q-item-label>{{ scope.opt.label }}</q-item-label>
                           </q-item-section>
-                        </q-item>
-                      </template>
-                    </q-select>
+                        </template>
+                        <template v-slot:option="scope">
+                          <q-item v-bind="scope.itemProps">
+                            <q-item-section avatar v-if="scope.opt.icon">
+                              <q-icon :name="scope.opt.icon" />
+                            </q-item-section>
+                            <q-item-section>
+                              <q-item-label>{{ scope.opt.label }}</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                        </template>
+                      </q-select>
+                    </div>
+                    
+                    <!-- Date -->
+                    <div class="col">
+                      <q-input
+                      v-model="form.date"
+                      label="Date *"
+                      type="date"
+                      filled
+                      required
+                      autocomplete="off"
+                      :rules="[val => !!val || 'Date is required']"
+                        />
+                      </div>
+                    </div>
                     
                     <!-- Location -->
                     <q-select
+                      v-if="form.type === 'in_person'"
                       v-model="form.location"
                       label="Location"
                       hint="Where did this conversation take place?"
@@ -150,7 +154,7 @@
                       new-value-mode="add-unique"
                       :options="conversationLocationOptions"
                       @filter="filterConversationLocations"
-                      class="q-mb-md"
+                      class="q-mb-xs"
                     >
                       <template v-slot:no-option>
                         <q-item>
@@ -160,13 +164,8 @@
                         </q-item>
                       </template>
                     </q-select>
-                  </q-card-section>
-                </q-card>
-
-                <!-- Notes Card -->
-                <q-card>
-                  <q-card-section>
-                    <div class="text-h6 q-mb-md">Notes</div>
+                    
+                    <div class="text-h6 q-mt-md q-mb-sm">Notes</div>
                     
                     <q-input
                       v-model="form.notes"
@@ -176,18 +175,9 @@
                       filled
                       required
                       autocomplete="off"
-                      hint="What was discussed? Key topics, outcomes, follow-ups needed, etc."
-                      class="q-mb-md"
                       :rules="[val => !!val || 'Notes are required']"
                     />
-                  </q-card-section>
-                </q-card>
 
-                <!-- Privacy Settings Card -->
-                <q-card>
-                  <q-card-section>
-                    <div class="text-h6 q-mb-md">Privacy Settings</div>
-                    
                     <q-checkbox
                       v-model="form.private"
                       label="Private conversation"

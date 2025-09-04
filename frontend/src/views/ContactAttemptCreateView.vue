@@ -62,7 +62,6 @@
                       emit-value
                       map-options
                       autocomplete="off"
-                      class="q-mb-md"
                       :rules="[val => !!val || 'Person is required']"
                       @popup-show="ensurePeopleLoaded"
                     >
@@ -75,84 +74,74 @@
                         </q-item>
                       </template>
                     </q-select>
-                    
-                    <!-- Date -->
-                    <q-input
-                      v-model="form.date"
-                      label="Date *"
-                      type="date"
-                      filled
-                      required
-                      autocomplete="off"
-                      class="q-mb-md"
-                      :rules="[val => !!val || 'Date is required']"
-                    />
-                    
-                    <!-- Type -->
-                    <q-select
-                      v-model="form.type"
-                      :options="contactAttemptTypes"
-                      label="Contact Type *"
-                      filled
-                      required
-                      option-value="value"
-                      option-label="label"
-                      emit-value
-                      map-options
-                      autocomplete="off"
-                      class="q-mb-md"
-                      :rules="[val => !!val || 'Contact type is required']"
-                    >
-                      <template v-slot:selected-item="scope">
-                        <q-item-section avatar v-if="scope.opt.icon">
-                          <q-icon :name="scope.opt.icon" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label>{{ scope.opt.label }}</q-item-label>
-                        </q-item-section>
-                      </template>
-                      <template v-slot:option="scope">
-                        <q-item v-bind="scope.itemProps">
-                          <q-item-section avatar v-if="scope.opt.icon">
-                            <q-icon :name="scope.opt.icon" />
-                          </q-item-section>
-                          <q-item-section>
-                            <q-item-label>{{ scope.opt.label }}</q-item-label>
-                          </q-item-section>
-                        </q-item>
-                      </template>
-                    </q-select>
-                  </q-card-section>
-                </q-card>
 
-                <!-- Notes Card -->
-                <q-card>
-                  <q-card-section>
-                    <div class="text-h6 q-mb-md">Notes</div>
+                    <div class="row q-col-gutter-sm">
+                      <div class="col-7 col-sm-6">
+                    
+                        <!-- Type -->
+                        <q-select
+                          v-model="form.type"
+                          :options="contactAttemptTypes"
+                          label="Contact Type *"
+                          filled
+                          required
+                          option-value="value"
+                          option-label="label"
+                          emit-value
+                          map-options
+                          autocomplete="off"
+                          :rules="[val => !!val || 'Contact type is required']"
+                        >
+                          <template v-slot:selected-item="scope">
+                            <q-item-section avatar v-if="scope.opt.icon">
+                              <q-icon :name="scope.opt.icon" />
+                            </q-item-section>
+                            <q-item-section>
+                              <q-item-label>{{ scope.opt.label }}</q-item-label>
+                            </q-item-section>
+                          </template>
+                          <template v-slot:option="scope">
+                            <q-item v-bind="scope.itemProps">
+                              <q-item-section avatar v-if="scope.opt.icon">
+                                <q-icon :name="scope.opt.icon" />
+                              </q-item-section>
+                              <q-item-section>
+                                <q-item-label>{{ scope.opt.label }}</q-item-label>
+                              </q-item-section>
+                            </q-item>
+                          </template>
+                        </q-select>
+                      </div>
+
+                      <div class="col">
+                        <!-- Date -->
+                        <q-input
+                          v-model="form.date"
+                          label="Date *"
+                          type="date"
+                          filled
+                          required
+                          autocomplete="off"
+                          :rules="[val => !!val || 'Date is required']"
+                        />
+                      </div>
+                    </div>
                     
                     <q-input
                       v-model="form.notes"
                       label="Notes"
                       type="textarea"
-                      rows="4"
+                      rows="2"
                       filled
                       autocomplete="off"
                       hint="What was the purpose? Any response or outcome?"
                       class="q-mb-md"
                     />
-                  </q-card-section>
-                </q-card>
-
-                <!-- Follow-up & Privacy -->
-                <q-card>
-                  <q-card-section>
-                    <div class="text-h6 q-mb-md">Follow-up & Privacy</div>
                     
                     <q-checkbox
                       v-model="form.ledToConversation"
                       label="This led to a conversation"
                       color="positive"
-                      class="q-mb-md"
                     />
 
                     <br>

@@ -29,7 +29,7 @@
                   color="accent"
                   icon="add_comment" 
                   :to="{ name: 'conversation-create' }"
-                  :label="$q.screen.gt.xs ? 'New Conversation' : undefined"
+                  :label="$q.screen.gt.sm ? 'New Conversation' : $q.screen.gt.xs ? 'Conversation' : undefined"
                 >
                   <q-tooltip v-if="!$q.screen.gt.xs">New Conversation</q-tooltip>
                 </q-btn>
@@ -37,7 +37,7 @@
                   color="secondary"
                   icon="contact_phone" 
                   :to="{ name: 'ping-create' }"
-                  :label="$q.screen.gt.xs ? 'New Ping' : undefined"
+                  :label="$q.screen.gt.sm ? 'New Ping' : $q.screen.gt.xs ? 'Ping' : undefined"
                 >
                   <q-tooltip v-if="!$q.screen.gt.xs">New Ping</q-tooltip>
                 </q-btn>
@@ -45,7 +45,7 @@
                   color="primary"
                   icon="person_add" 
                   :to="{ name: 'person-edit', params: {id: 'new' } }"
-                  :label="$q.screen.gt.xs ? 'Add Person' : undefined"
+                  :label="$q.screen.gt.sm ? 'Add Person' : $q.screen.gt.xs ? 'Person' : undefined"
                 >
                   <q-tooltip v-if="!$q.screen.gt.xs">Add Person</q-tooltip>
                 </q-btn>
@@ -144,7 +144,7 @@
                       <q-item-section>
                         <q-item-label>{{ person.name }}</q-item-label>
                         <q-item-label caption>
-                          {{ person.conversation_count_recent }} {{ pluralize(person.conversation_count_recent, 'conversation', 'conversations') }}
+                          {{ person.recent_conversation_count }} {{ pluralize(person.recent_conversation_count, 'conversation', 'conversations') }}
                         </q-item-label>
                       </q-item-section>
                     </q-item>

@@ -54,12 +54,12 @@
           <q-card class="header-card q-mb-lg" flat>
             <q-card-section class="q-pa-lg">
               <div class="row items-start q-gutter-md">
-                <div class="col-auto">
+                <div class="col-auto gt-sm">
                   <q-avatar size="64px" :color="getTypeColor(conversation.type)" text-color="white">
                     <q-icon :name="getTypeIcon(conversation.type)" size="32px" />
                   </q-avatar>
                 </div>
-                <div class="col">
+                <div class="col-12 col-sm">
                   <div class="row items-center q-gutter-sm q-mb-sm">
                     <div class="text-h5 text-weight-medium">{{ getParticipantNames(conversation.participants) }}</div>
                     <q-chip 
@@ -85,7 +85,7 @@
                     </span>
                   </div>
                 </div>
-                <div class="col-auto">
+                <div class="col-12 col-sm-auto">
                   <div class="action-buttons">
                     <q-btn 
                       outline

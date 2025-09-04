@@ -13,7 +13,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from .models import Person, Conversation, ContactAttempt, Relationship
 from .serializers import (
-    PersonSerializer, ConversationSerializer, 
+    PersonSerializer, PersonDetailedSerializer, ConversationSerializer, 
     ContactAttemptSerializer, RelationshipSerializer
 )
 
@@ -325,9 +325,9 @@ def dashboard_analytics(request):
     # Upcoming birthdays in the next 30 days
     upcoming_birthdays = get_upcoming_birthdays(days_ahead=30)
     
-    response = Response({
+    return Response({
         'recent_conversations': ConversationSerializer(recent_conversations, many=True).data,
-        'top_contacts': PersonSerializer(top_contacts, many=True).data,
+        'top_contacts': PersonDetailedSerializer(top_contacts, many=True).data,
         'activity_overview': {
             'conversations': {
                 'week': conversations_week,
@@ -344,7 +344,6 @@ def dashboard_analytics(request):
         'monthly_activity': monthly_data,
         'upcoming_birthdays': upcoming_birthdays
     })
-    return response
 
 
 @api_view(['GET'])

@@ -73,7 +73,7 @@
                       color="secondary" 
                       icon="chat_bubble" 
                       label="Log Conversation"
-                      class="q-mr-sm"
+                      class="q-mr-sm q-mb-sm"
                       @click="addConversation"
                     />
                     <q-btn 
@@ -81,7 +81,7 @@
                       color="secondary" 
                       icon="contact_phone" 
                       label="Ping"
-                      class="q-mr-sm"
+                      class="q-mr-sm q-mb-sm"
                       @click="addContactAttempt"
                     />
                     <q-btn 
@@ -89,7 +89,7 @@
                       color="primary" 
                       icon="edit" 
                       label="Edit"
-                      class="q-mr-sm"
+                      class="q-mr-sm q-mb-sm"
                       @click="editPerson"
                     />
                     <q-btn 
@@ -97,6 +97,7 @@
                       color="negative" 
                       icon="delete" 
                       label="Delete"
+                      class="q-mb-sm"
                       @click="showDeleteDialog = true"
                     />
                   </div>
