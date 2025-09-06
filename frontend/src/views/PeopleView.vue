@@ -176,7 +176,7 @@ const peopleStore = usePeopleStore()
 
 const leftDrawerOpen = ref(false)
 const searchQuery = ref('')
-const sortBy = ref('name')
+const sortBy = ref('-last_contacted')
 const locationFilter = ref('')
 
 // Options for sorting
