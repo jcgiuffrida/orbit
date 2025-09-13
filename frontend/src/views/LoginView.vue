@@ -78,14 +78,17 @@ const handleSubmit = async () => {
 
   const result = await authStore.login(username.value, password.value, otpToken.value)
   
-  if (result.success) {
+  if (result?.success) {
     router.push({ name: 'home' })
-  } else if (result.requires_2fa) {
+  } else if (result?.requires_2fa) {
     showOtpField.value = true
     error.value = ''
   } else {
-    error.value = result.error
-    showOtpField.value = false
+    error.value = result ? result.error : 'Login failed'
+    // Only hide OTP field for credential errors, not for invalid 2FA token errors
+    if (!showOtpField.value) {
+      showOtpField.value = false
+    }
   }
 }
 </script>
