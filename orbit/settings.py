@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_vite',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
     'orbit',
 ]
 
@@ -42,6 +44,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -148,6 +151,15 @@ DJANGO_VITE = {
         'static_url_prefix': '',
     }
 }
+
+# Security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+# OTP (Two-Factor Authentication) settings
+OTP_TOTP_ISSUER = 'Orbit Family App'
+OTP_LOGIN_URL = '/login/'
 
 # Import Jazzmin settings
 from .jazzmin_settings import JAZZMIN_SETTINGS, JAZZMIN_UI_TWEAKS

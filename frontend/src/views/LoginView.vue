@@ -20,16 +20,29 @@
             required
             :disable="authStore.isLoading"
           />
+          <q-input
+            v-if="showOtpField"
+            v-model="otpToken"
+            label="Authentication Code"
+            outlined
+            required
+            :disable="authStore.isLoading"
+            placeholder="Enter 6-digit code from your authenticator app"
+            maxlength="6"
+          />
           <q-btn
             type="submit"
             color="primary"
             class="full-width"
             :loading="authStore.isLoading"
-            label="Login"
+            :label="showOtpField ? 'Complete Login' : 'Login'"
           />
         </q-form>
         <q-banner v-if="error" class="bg-negative text-white q-mt-md" rounded>
           {{ error }}
+        </q-banner>
+        <q-banner v-if="showOtpField && !error" class="bg-info text-white q-mt-md" rounded>
+          Please enter the 6-digit code from your authenticator app to complete login.
         </q-banner>
       </q-card-section>
     </q-card>
@@ -46,7 +59,9 @@ const authStore = useAuthStore()
 
 const username = ref('')
 const password = ref('')
+const otpToken = ref('')
 const error = ref('')
+const showOtpField = ref(false)
 
 const handleSubmit = async () => {
   error.value = ''
@@ -56,12 +71,21 @@ const handleSubmit = async () => {
     return
   }
 
-  const result = await authStore.login(username.value, password.value)
+  if (showOtpField.value && !otpToken.value) {
+    error.value = 'Please enter the authentication code'
+    return
+  }
+
+  const result = await authStore.login(username.value, password.value, otpToken.value)
   
   if (result.success) {
     router.push({ name: 'home' })
+  } else if (result.requires_2fa) {
+    showOtpField.value = true
+    error.value = ''
   } else {
     error.value = result.error
+    showOtpField.value = false
   }
 }
 </script>

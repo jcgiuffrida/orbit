@@ -11,6 +11,13 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Count, Max
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.http import HttpResponse
+from django_otp import match_token
+from django_otp.models import Device
+from django_otp.plugins.otp_totp.models import TOTPDevice
+import qrcode
+import io
+import base64
 from .models import Person, Conversation, ContactAttempt, Relationship
 from .serializers import (
     PersonSerializer, PersonDetailedSerializer, ConversationSerializer, 
@@ -89,23 +96,23 @@ class RelationshipViewSet(viewsets.ModelViewSet):
 def current_user(request):
     """Get current authenticated user info"""
     user = request.user
+    totp_devices = TOTPDevice.objects.filter(user=user, confirmed=True)
     return Response({
         'id': user.id,
         'username': user.username,
-        'email': user.email,
         'first_name': user.first_name,
         'last_name': user.last_name,
-        'is_staff': user.is_staff,
-        'is_superuser': user.is_superuser,
+        'has_2fa': totp_devices.exists(),
     })
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    """Login endpoint"""
+    """Login endpoint with 2FA support"""
     username = request.data.get('username')
     password = request.data.get('password')
+    otp_token = request.data.get('otp_token')
     
     if not username or not password:
         return Response(
@@ -116,17 +123,35 @@ def login_view(request):
     user = authenticate(request, username=username, password=password)
     
     if user is not None:
+        # Check if user has 2FA enabled
+        totp_devices = TOTPDevice.objects.filter(user=user, confirmed=True)
+        
+        if totp_devices.exists():
+            # 2FA is enabled, require OTP token
+            if not otp_token:
+                return Response(
+                    {'error': 'Two-factor authentication required', 'requires_2fa': True}, 
+                    status=status.HTTP_200_OK
+                )
+            
+            # Verify OTP token
+            device = match_token(user, otp_token)
+            if not device:
+                return Response(
+                    {'error': 'Invalid authentication token'}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+        
+        # Login successful (with or without 2FA)
         login(request, user)
         return Response({
             'success': True,
             'user': {
                 'id': user.id,
                 'username': user.username,
-                'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'is_staff': user.is_staff,
-                'is_superuser': user.is_superuser,
+                'has_2fa': totp_devices.exists(),
             }
         })
     else:
@@ -377,6 +402,125 @@ def birthday_timeline(request):
     days_ahead = int(request.GET.get('days', 365))  # Default to 1 year
     return Response({
         'birthdays': get_upcoming_birthdays(days_ahead=days_ahead)
+    })
+
+
+# 2FA Management endpoints
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def setup_2fa(request):
+    """Setup 2FA for the current user"""
+    user = request.user
+    
+    # Check if user already has 2FA enabled
+    existing_devices = TOTPDevice.objects.filter(user=user, confirmed=True)
+    if existing_devices.exists():
+        return Response(
+            {'error': 'Two-factor authentication is already enabled'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Create a new TOTP device (unconfirmed)
+    device = TOTPDevice.objects.create(
+        user=user,
+        name=f'{user.username}-totp',
+        confirmed=False
+    )
+    
+    # Generate QR code
+    qr_url = device.config_url
+    
+    # Create QR code image
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(qr_url)
+    qr.make(fit=True)
+    
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+    
+    # Convert to base64
+    qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+    
+    return Response({
+        'success': True,
+        'qr_code': f'data:image/png;base64,{qr_code_base64}',
+        'secret_key': device.key,
+        'device_id': device.id
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def confirm_2fa(request):
+    """Confirm 2FA setup by verifying a token"""
+    user = request.user
+    token = request.data.get('token')
+    device_id = request.data.get('device_id')
+    
+    if not token or not device_id:
+        return Response(
+            {'error': 'Token and device_id are required'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        device = TOTPDevice.objects.get(id=device_id, user=user, confirmed=False)
+    except TOTPDevice.DoesNotExist:
+        return Response(
+            {'error': 'Invalid device'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Verify the token
+    if device.verify_token(token):
+        device.confirmed = True
+        device.save()
+        return Response({'success': True, 'message': 'Two-factor authentication enabled'})
+    else:
+        return Response(
+            {'error': 'Invalid token'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def disable_2fa(request):
+    """Disable 2FA for the current user"""
+    user = request.user
+    password = request.data.get('password')
+    
+    if not password:
+        return Response(
+            {'error': 'Password confirmation required'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Verify password
+    if not user.check_password(password):
+        return Response(
+            {'error': 'Invalid password'}, 
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    # Delete all TOTP devices for the user
+    TOTPDevice.objects.filter(user=user).delete()
+    
+    return Response({'success': True, 'message': 'Two-factor authentication disabled'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_2fa_status(request):
+    """Get 2FA status for the current user"""
+    user = request.user
+    totp_devices = TOTPDevice.objects.filter(user=user, confirmed=True)
+    
+    return Response({
+        'has_2fa': totp_devices.exists(),
+        'device_count': totp_devices.count()
     })
 
 

@@ -4,7 +4,7 @@ from .views import (
     PersonViewSet, ConversationViewSet, ContactAttemptViewSet, RelationshipViewSet,
     current_user, login_view, logout_view, csrf_token, dashboard_analytics,
     location_suggestions, company_suggestions, conversation_location_suggestions,
-    birthday_timeline
+    birthday_timeline, setup_2fa, confirm_2fa, disable_2fa, get_2fa_status
 )
 
 router = DefaultRouter()
@@ -24,4 +24,8 @@ urlpatterns = [
     path('auth/login/', login_view, name='login'),
     path('auth/logout/', logout_view, name='logout'),
     path('auth/csrf/', csrf_token, name='csrf-token'),
+    path('auth/2fa/setup/', setup_2fa, name='setup-2fa'),
+    path('auth/2fa/confirm/', confirm_2fa, name='confirm-2fa'),
+    path('auth/2fa/disable/', disable_2fa, name='disable-2fa'),
+    path('auth/2fa/status/', get_2fa_status, name='2fa-status'),
 ]

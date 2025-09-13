@@ -28,19 +28,27 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const login = async (username, password) => {
+  const login = async (username, password, otpToken = null) => {
     loading.value = true
     try {
-      const response = await authService.login(username, password)
+      const response = await authService.login(username, password, otpToken)
       if (response.success) {
         user.value = response.user
         return { success: true }
       } else {
+        // Check if 2FA is required
+        if (response.requires_2fa) {
+          return { success: false, requires_2fa: true, error: response.error }
+        }
         return { success: false, error: response.error || 'Login failed' }
       }
     } catch (error) {
       console.error('Login failed:', error)
-      const message = error.response?.data?.error || 'Login failed'
+      const errorData = error.response?.data
+      if (errorData?.requires_2fa) {
+        return { success: false, requires_2fa: true, error: errorData.error }
+      }
+      const message = errorData?.error || 'Login failed'
       return { success: false, error: message }
     } finally {
       loading.value = false
