@@ -1,21 +1,43 @@
 <template>
-  <q-drawer :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" show-if-above bordered class="bg-grey-1" width="250">
-    <q-list>
-      <q-item 
-        v-for="item in navigationItems" 
-        :key="item.name"
-        clickable 
-        v-ripple 
-        :to="{ name: item.name }"
-        :active="isActive(item.name)"
-        active-class="text-primary bg-grey-3"
-      >
-        <q-item-section avatar>
-          <q-icon :name="item.icon" />
-        </q-item-section>
-        <q-item-section>{{ item.label }}</q-item-section>
-      </q-item>
-    </q-list>
+  <q-drawer :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" show-if-above bordered class="bg-grey-1" :width="250">
+    <div class="column full-height">
+      <!-- Main navigation items -->
+      <q-list class="col">
+        <q-item 
+          v-for="item in navigationItems" 
+          :key="item.name"
+          clickable 
+          v-ripple 
+          :to="{ name: item.name }"
+          :active="isActive(item.name)"
+          active-class="text-primary bg-grey-3"
+        >
+          <q-item-section avatar>
+            <q-icon :name="item.icon" />
+          </q-item-section>
+          <q-item-section>{{ item.label }}</q-item-section>
+        </q-item>
+      </q-list>
+
+      <!-- Bottom navigation items -->
+      <q-separator />
+      <q-list class="col-auto">
+        <q-item 
+          v-for="item in bottomNavigationItems" 
+          :key="item.name"
+          clickable 
+          v-ripple 
+          :to="{ name: item.name }"
+          :active="isActive(item.name)"
+          active-class="text-primary bg-grey-3"
+        >
+          <q-item-section avatar>
+            <q-icon :name="item.icon" />
+          </q-item-section>
+          <q-item-section>{{ item.label }}</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
   </q-drawer>
 </template>
 
@@ -39,11 +61,14 @@ const navigationItems = [
   { name: 'people', label: 'People', icon: 'people' },
   { name: 'conversations', label: 'Conversations', icon: 'chat' },
   { name: 'pings', label: 'Pings', icon: 'contact_phone' },
-  { name: 'birthdays', label: 'Birthdays', icon: 'cake' },
+  { name: 'birthdays', label: 'Birthdays', icon: 'cake' }
+]
+
+const bottomNavigationItems = [
   { name: 'security', label: 'Security', icon: 'security' }
 ]
 
 const isActive = computed(() => (routeName) => {
-  return route.name === routeName
+  return route?.name === routeName
 })
 </script>

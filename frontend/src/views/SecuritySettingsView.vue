@@ -1,55 +1,68 @@
 <template>
-  <div class="q-pa-md">
-    <AppHeader title="Security Settings" />
-    
-    <div class="row justify-center">
-      <div class="col-12 col-md-8 col-lg-6">
-        <q-card class="q-pa-lg">
-          <q-card-section>
-            <div class="text-h5 q-mb-md">Two-Factor Authentication</div>
-            <div class="text-body1 q-mb-lg text-grey-7">
-              Add an extra layer of security to your account by requiring an authentication code from your mobile device when signing in.
-            </div>
+  <q-layout view="lHh Lpr lFf">
+    <AppHeader @toggle-drawer="leftDrawerOpen = !leftDrawerOpen" />
 
-            <!-- 2FA Status -->
-            <div v-if="!loading">
-              <div v-if="!twoFactorEnabled" class="q-mb-lg">
-                <q-icon name="security" size="3em" color="grey-5" class="q-mb-md" />
-                <div class="text-h6 q-mb-sm">Two-factor authentication is not enabled</div>
-                <div class="text-body2 text-grey-7 q-mb-lg">
-                  Enable 2FA to protect your account with an additional security layer.
-                </div>
-                <q-btn 
-                  color="primary" 
-                  label="Enable 2FA" 
-                  @click="startSetup"
-                  :loading="setupLoading"
-                />
-              </div>
+    <NavigationDrawer v-model="leftDrawerOpen" />
 
-              <div v-else class="q-mb-lg">
-                <q-icon name="verified" size="3em" color="green" class="q-mb-md" />
-                <div class="text-h6 q-mb-sm text-green">Two-factor authentication is enabled</div>
-                <div class="text-body2 text-grey-7 q-mb-lg">
-                  Your account is protected with two-factor authentication.
-                </div>
-                <q-btn 
-                  color="negative" 
-                  outline
-                  label="Disable 2FA" 
-                  @click="showDisableDialog = true"
-                />
+    <q-page-container>
+      <q-page class="q-pa-md">
+        <div class="row justify-center">
+          <div class="col-12 col-md-8 col-lg-6">
+            <!-- Page Header -->
+            <div class="row items-center q-mb-lg">
+              <div class="col">
+                <h1 class="text-h4 q-ma-none">Security Settings</h1>
               </div>
             </div>
 
-            <!-- Loading -->
-            <div v-else class="text-center q-py-lg">
-              <q-spinner size="50px" />
-            </div>
-          </q-card-section>
-        </q-card>
-      </div>
-    </div>
+            <q-card class="q-pa-lg">
+              <q-card-section>
+                <div class="text-h5 q-mb-md">Two-Factor Authentication</div>
+                <div class="text-body1 q-mb-lg text-grey-7">
+                  Add an extra layer of security to your account by requiring an authentication code from your mobile device when signing in.
+                </div>
+
+                <!-- 2FA Status -->
+                <div v-if="!loading">
+                  <div v-if="!twoFactorEnabled" class="q-mb-lg">
+                    <q-icon name="security" size="3em" color="grey-5" class="q-mb-md" />
+                    <div class="text-h6 q-mb-sm">Two-factor authentication is not enabled</div>
+                    <div class="text-body2 text-grey-7 q-mb-lg">
+                      Enable 2FA to protect your account with an additional security layer.
+                    </div>
+                    <q-btn 
+                      color="primary" 
+                      label="Enable 2FA" 
+                      @click="startSetup"
+                      :loading="setupLoading"
+                    />
+                  </div>
+
+                  <div v-else class="q-mb-lg">
+                    <q-icon name="verified" size="3em" color="green" class="q-mb-md" />
+                    <div class="text-h6 q-mb-sm text-green">Two-factor authentication is enabled</div>
+                    <div class="text-body2 text-grey-7 q-mb-lg">
+                      Your account is protected with two-factor authentication.
+                    </div>
+                    <q-btn 
+                      color="negative" 
+                      outline
+                      label="Disable 2FA" 
+                      @click="showDisableDialog = true"
+                    />
+                  </div>
+                </div>
+
+                <!-- Loading -->
+                <div v-else class="text-center q-py-lg">
+                  <q-spinner size="50px" />
+                </div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
+      </q-page>
+    </q-page-container>
 
     <!-- Setup 2FA Dialog -->
     <q-dialog v-model="showSetupDialog" persistent>
@@ -131,14 +144,17 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-  </div>
+  </q-layout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import AppHeader from '@/components/AppHeader.vue'
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import authService from '@/services/auth'
+
+const leftDrawerOpen = ref(false)
 
 const $q = useQuasar()
 

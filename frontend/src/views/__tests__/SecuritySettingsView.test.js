@@ -65,7 +65,7 @@ describe('SecuritySettingsView', () => {
     
     const wrapper = createWrapper()
 
-    expect(wrapper.find('.app-header').text()).toBe('Security Settings')
+    expect(wrapper.find('h1').text()).toBe('Security Settings')
     expect(wrapper.text()).toContain('Two-Factor Authentication')
     expect(wrapper.text()).toContain('Add an extra layer of security')
   })
