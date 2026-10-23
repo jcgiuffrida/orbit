@@ -1,6 +1,6 @@
 # Orbit
 
-A personal family app for tracking people and conversations in a social orbit. (Not a public app) Claude did 30% of the design and 80% of the coding. 
+A personal family app for tracking people and conversations in a social orbit.
 
 ## Overview
 
